@@ -2,17 +2,15 @@
   "name": "cinevo",
   "version": "1.0.0",
   "private": true,
-  "description": "Cinevo - Public-First Streaming Platform",
+  "description": "Cinevo - Standalone Streaming Platform",
   "scripts": {
-    "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"bgBlue.bold,bgMagenta.bold\" \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "dev": "npm run dev --prefix frontend",
     "build": "cd frontend && npm install && npm run build:pages",
     "build:pages": "npm --prefix frontend install && npm --prefix frontend run build:pages",
-    "build:all": "npm run build --prefix backend && npm run build --prefix frontend",
-    "deploy": "wrangler deploy",
-    "install:all": "npm install && npm install --prefix backend && npm install --prefix frontend"
+    "start": "npm run start --prefix frontend",
+    "install:all": "npm --prefix frontend install"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2",
     "wrangler": "^4.128.0"
   }
 }

@@ -3,14 +3,12 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Bookmark, Play, Trash2, LogIn, Film, Tv } from 'lucide-react';
+import { Bookmark, Play, Trash2, Film, Tv } from 'lucide-react';
 import { useWatchlist } from '../../hooks/useMedia';
-import { useAuth } from '../../lib/authContext';
 import { getTmdbImageUrl } from '../../lib/utils';
 
 export default function MyListPage() {
   const { data: watchlist = [], isLoading, toggleWatchlist } = useWatchlist();
-  const { isAuthenticated } = useAuth();
 
   return (
     <div className="pt-24 pb-20 px-4 md:px-12 max-w-7xl mx-auto min-h-screen">
@@ -24,22 +22,6 @@ export default function MyListPage() {
             Your saved movies and series ready for streaming.
           </p>
         </div>
-
-        {/* Sync Prompt if Guest */}
-        {!isAuthenticated && (
-          <div className="flex items-center gap-3 p-3 rounded-xl bg-zinc-900 border border-white/10 text-xs">
-            <span className="text-zinc-400">
-              Saved in browser. Sign in to sync across devices.
-            </span>
-            <Link
-              href="/login"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-red text-white font-semibold hover:bg-red-700 transition"
-            >
-              <LogIn className="w-3.5 h-3.5" />
-              <span>Sign In</span>
-            </Link>
-          </div>
-        )}
       </div>
 
       {isLoading ? (

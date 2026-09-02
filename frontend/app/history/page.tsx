@@ -3,16 +3,14 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Clock, Play, Trash2, LogIn, Film, Tv } from 'lucide-react';
+import { Clock, Play, Trash2, Film, Tv } from 'lucide-react';
 import { useHistory } from '../../hooks/useMedia';
-import { useAuth } from '../../lib/authContext';
 import { getTmdbImageUrl } from '../../lib/utils';
 import { guestStorage } from '../../lib/guestStorage';
 import { useQueryClient } from '@tanstack/react-query';
 
 export default function HistoryPage() {
   const { data: history = [], isLoading } = useHistory();
-  const { isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
 
   const handleClear = () => {
@@ -36,14 +34,6 @@ export default function HistoryPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          {!isAuthenticated && (
-            <div className="hidden sm:flex items-center gap-2 text-xs text-zinc-400 p-2.5 rounded-xl bg-zinc-900 border border-white/10">
-              <span>Saved locally.</span>
-              <Link href="/login" className="text-brand-red font-semibold hover:underline flex items-center gap-1">
-                <LogIn className="w-3.5 h-3.5" /> Sign in to sync
-              </Link>
-            </div>
-          )}
 
           {history.length > 0 && (
             <button

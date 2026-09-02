@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { guestStorage } from '../lib/guestStorage';
-import { useAuth } from '../lib/authContext';
 
 export function useTrendingMovies(page = 1) {
   return useQuery({
@@ -109,15 +108,11 @@ export function usePlayback(type: 'movie' | 'tv', id: number, season = 1, episod
 }
 
 export function useWatchlist() {
-  const { isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ['watchlist', isAuthenticated],
+    queryKey: ['watchlist'],
     queryFn: async () => {
-      if (isAuthenticated) {
-        return await api.getWatchlist();
-      }
       return guestStorage.getWatchlist();
     },
   });
@@ -130,18 +125,7 @@ export function useWatchlist() {
       posterPath: string | null;
       voteAverage?: number;
     }) => {
-      if (isAuthenticated) {
-        // Check if exists
-        const currentList = queryClient.getQueryData<any[]>(['watchlist', true]) || [];
-        const existing = currentList.find((i) => i.tmdbId === item.tmdbId && i.mediaType === item.mediaType);
-        if (existing) {
-          await api.removeFromWatchlist(existing.id);
-        } else {
-          await api.addToWatchlist(item);
-        }
-      } else {
-        guestStorage.toggleWatchlist(item);
-      }
+      guestStorage.toggleWatchlist(item);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['watchlist'] });
@@ -152,15 +136,11 @@ export function useWatchlist() {
 }
 
 export function useHistory() {
-  const { isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ['history', isAuthenticated],
+    queryKey: ['history'],
     queryFn: async () => {
-      if (isAuthenticated) {
-        return await api.getHistory();
-      }
       return guestStorage.getHistory();
     },
   });
@@ -176,11 +156,7 @@ export function useHistory() {
       progress: number;
       duration: number;
     }) => {
-      // Always save locally for instant response
       guestStorage.saveHistory(item);
-      if (isAuthenticated) {
-        await api.updateHistory(item);
-      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['history'] });

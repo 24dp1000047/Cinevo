@@ -3,14 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, Film, Bookmark, Clock, User, LogOut, Menu, X } from 'lucide-react';
-import { useAuth } from '../../lib/authContext';
+import { Search, Film, Bookmark, Settings, Menu, X } from 'lucide-react';
 import { SearchOverlay } from '../search/SearchOverlay';
 import { useWatchlist } from '../../hooks/useMedia';
 
 export function Navbar() {
   const pathname = usePathname();
-  const { user, isAuthenticated, logout } = useAuth();
   const { data: watchlist = [] } = useWatchlist();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -78,8 +76,8 @@ export function Navbar() {
             </nav>
           </div>
 
-          {/* Right: Search, Guest indicator & User Profile */}
-          <div className="flex items-center gap-4">
+          {/* Right: Search, My List & Preferences */}
+          <div className="flex items-center gap-3">
             {/* Search Button */}
             <button
               onClick={() => setIsSearchOpen(true)}
@@ -89,65 +87,28 @@ export function Navbar() {
               <Search className="w-5 h-5" />
             </button>
 
-            {/* Auth / Profile */}
-            {isAuthenticated && user ? (
-              <div className="relative group">
-                <Link
-                  href="/profile"
-                  className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-full bg-zinc-800/80 hover:bg-zinc-700/80 border border-white/10 text-sm font-medium transition"
-                >
-                  <div className="w-7 h-7 rounded-full bg-brand-red text-white flex items-center justify-center font-bold text-xs uppercase">
-                    {user.name ? user.name.charAt(0) : user.email.charAt(0)}
-                  </div>
-                  <span className="hidden sm:inline text-zinc-200 max-w-[100px] truncate">
-                    {user.name || user.email.split('@')[0]}
-                  </span>
-                </Link>
-
-                {/* Dropdown Menu */}
-                <div className="absolute right-0 mt-2 w-48 py-2 rounded-xl bg-zinc-900 border border-white/10 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                  <div className="px-4 py-2 border-b border-white/10 text-xs text-zinc-400">
-                    Signed in as <strong className="text-white block truncate">{user.email}</strong>
-                  </div>
-                  <Link
-                    href="/profile"
-                    className="flex items-center gap-2 px-4 py-2 text-sm text-zinc-300 hover:bg-white/5 hover:text-white transition"
-                  >
-                    <User className="w-4 h-4" /> Profile & Settings
-                  </Link>
-                  <Link
-                    href="/my-list"
-                    className="flex items-center gap-2 px-4 py-2 text-sm text-zinc-300 hover:bg-white/5 hover:text-white transition"
-                  >
-                    <Bookmark className="w-4 h-4" /> My List
-                  </Link>
-                  <Link
-                    href="/history"
-                    className="flex items-center gap-2 px-4 py-2 text-sm text-zinc-300 hover:bg-white/5 hover:text-white transition"
-                  >
-                    <Clock className="w-4 h-4" /> History
-                  </Link>
-                  <button
-                    onClick={logout}
-                    className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 transition mt-1 border-t border-white/5"
-                  >
-                    <LogOut className="w-4 h-4" /> Sign Out
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center gap-3">
-                <span className="hidden lg:inline text-xs text-zinc-500 uppercase tracking-widest font-semibold">
-                  Guest Mode
+            {/* Quick My List Link */}
+            <Link
+              href="/my-list"
+              className="hidden sm:flex items-center gap-1.5 p-2 rounded-full hover:bg-white/10 text-zinc-300 hover:text-white transition relative"
+              title="My Bookmarks"
+            >
+              <Bookmark className="w-5 h-5" />
+              {watchlist.length > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-brand-red text-white text-[10px] font-bold flex items-center justify-center">
+                  {watchlist.length}
                 </span>
-                <Link
-                  href="/login"
-                  className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-sm font-semibold text-white border border-white/10 transition hover:scale-105"
-                >
-                  Sign In
-                </Link>
-              </div>
-            )}
+              )}
+            </Link>
+
+            {/* Preferences / Settings Link */}
+            <Link
+              href="/profile"
+              className="flex items-center gap-2 p-2.5 rounded-full hover:bg-white/10 text-zinc-300 hover:text-white transition"
+              title="Preferences & Settings"
+            >
+              <Settings className="w-5 h-5" />
+            </Link>
 
             {/* Mobile Menu Toggle */}
             <button
@@ -179,6 +140,13 @@ export function Navbar() {
                 )}
               </Link>
             ))}
+            <Link
+              href="/profile"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="flex items-center gap-2 py-2 px-3 rounded-lg text-sm font-medium text-zinc-300 hover:bg-white/5 border-t border-white/5 pt-3"
+            >
+              <Settings className="w-4 h-4" /> Preferences
+            </Link>
           </div>
         )}
       </header>

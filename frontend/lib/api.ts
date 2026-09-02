@@ -1,112 +1,238 @@
 import axios from 'axios';
-import { Movie, TVShow, SeasonDetails, MediaCredits, PlaybackResponse, WatchlistItem, WatchHistoryItem, UserProfile } from '../types';
+import { Movie, TVShow, SeasonDetails, MediaCredits, PlaybackResponse, WatchlistItem, WatchHistoryItem, StreamServer, StreamSource } from '../types';
+import { guestStorage } from './guestStorage';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const TMDB_API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY || 'a9747fa4c63043ac63a74fbb0c0000ae';
+const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
-export const apiClient = axios.create({
-  baseURL: `${API_BASE_URL}/api`,
-  headers: {
-    'Content-Type': 'application/json',
+const tmdbClient = axios.create({
+  baseURL: TMDB_BASE_URL,
+  params: {
+    api_key: TMDB_API_KEY,
   },
 });
 
-apiClient.interceptors.request.use((config) => {
-  if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('cinevo_auth_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  }
-  return config;
-});
+const generateServers = (tmdbId: number, season?: number, episode?: number): StreamServer[] => {
+  const isTV = Boolean(season && episode);
+  const s = season || 1;
+  const e = episode || 1;
+
+  return [
+    {
+      id: 'vidlink',
+      name: '#1 VidLink Pro',
+      quality: '1080p HD',
+      type: 'embed',
+      icon: 'zap',
+      url: isTV
+        ? `https://vidlink.pro/tv/${tmdbId}/${s}/${e}`
+        : `https://vidlink.pro/movie/${tmdbId}`,
+    },
+    {
+      id: 'vidsrc-su',
+      name: '#2 VidSrc.su',
+      quality: '1080p Ultra',
+      type: 'embed',
+      icon: 'globe',
+      url: isTV
+        ? `https://vidsrc.su/embed/tv/${tmdbId}/${s}/${e}`
+        : `https://vidsrc.su/embed/movie/${tmdbId}`,
+    },
+    {
+      id: 'autoembed',
+      name: '#3 AutoEmbed.cc',
+      quality: '1080p HD',
+      type: 'embed',
+      icon: 'radio',
+      url: isTV
+        ? `https://player.autoembed.cc/embed/tv/${tmdbId}/${s}/${e}`
+        : `https://player.autoembed.cc/embed/movie/${tmdbId}`,
+    },
+    {
+      id: 'vidsrc-me',
+      name: '#4 VidSrc.me',
+      quality: '1080p HD',
+      type: 'embed',
+      icon: 'play',
+      url: isTV
+        ? `https://vidsrc.me/embed/tv?tmdb=${tmdbId}&season=${s}&episode=${e}`
+        : `https://vidsrc.me/embed/movie?tmdb=${tmdbId}`,
+    },
+    {
+      id: 'smashy',
+      name: '#5 SmashyStream',
+      quality: '1080p HD',
+      type: 'embed',
+      icon: 'layers',
+      url: isTV
+        ? `https://embed.smashystream.com/playere.php?tmdb=${tmdbId}&season=${s}&episode=${e}`
+        : `https://embed.smashystream.com/playere.php?tmdb=${tmdbId}`,
+    },
+    {
+      id: 'embed-su',
+      name: '#6 Embed.su',
+      quality: '1080p HD',
+      type: 'embed',
+      icon: 'sparkles',
+      url: isTV
+        ? `https://embed.su/embed/tv/${tmdbId}/${s}/${e}`
+        : `https://embed.su/embed/movie/${tmdbId}`,
+    },
+    {
+      id: 'native-hls',
+      name: '#7 Cinevo Direct',
+      quality: 'Direct HLS',
+      type: 'hls',
+      icon: 'server',
+      url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+    },
+  ];
+};
+
+const defaultSources: StreamSource[] = [
+  {
+    url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+    type: 'hls',
+    quality: 'auto',
+    server: 'Primary HLS Edge',
+  },
+  {
+    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+    type: 'mp4',
+    quality: '1080p',
+    server: 'Direct CDN Fallback',
+  },
+];
 
 export const api = {
   // Movies
-  getTrendingMovies: async (page = 1) => {
-    const res = await apiClient.get<{ success: boolean; data: { results: Movie[] } }>(`/movies/trending?page=${page}`);
-    return res.data.data.results;
+  getTrendingMovies: async (page = 1): Promise<Movie[]> => {
+    const res = await tmdbClient.get('/trending/movie/week', { params: { page } });
+    return res.data.results || [];
   },
-  getPopularMovies: async (page = 1) => {
-    const res = await apiClient.get<{ success: boolean; data: { results: Movie[] } }>(`/movies/popular?page=${page}`);
-    return res.data.data.results;
+  getPopularMovies: async (page = 1): Promise<Movie[]> => {
+    const res = await tmdbClient.get('/movie/popular', { params: { page } });
+    return res.data.results || [];
   },
-  getTopRatedMovies: async (page = 1) => {
-    const res = await apiClient.get<{ success: boolean; data: { results: Movie[] } }>(`/movies/top-rated?page=${page}`);
-    return res.data.data.results;
+  getTopRatedMovies: async (page = 1): Promise<Movie[]> => {
+    const res = await tmdbClient.get('/movie/top_rated', { params: { page } });
+    return res.data.results || [];
   },
-  getMovieDetails: async (id: number) => {
-    const res = await apiClient.get<{ success: boolean; data: Movie }>(`/movies/${id}`);
-    return res.data.data;
+  getMovieDetails: async (id: number): Promise<Movie> => {
+    const res = await tmdbClient.get(`/movie/${id}`);
+    return res.data;
   },
-  getMovieCredits: async (id: number) => {
-    const res = await apiClient.get<{ success: boolean; data: MediaCredits }>(`/movies/${id}/credits`);
-    return res.data.data;
+  getMovieCredits: async (id: number): Promise<MediaCredits> => {
+    const res = await tmdbClient.get(`/movie/${id}/credits`);
+    return res.data;
   },
-  getSimilarMovies: async (id: number) => {
-    const res = await apiClient.get<{ success: boolean; data: { results: Movie[] } }>(`/movies/${id}/similar`);
-    return res.data.data.results;
+  getSimilarMovies: async (id: number): Promise<Movie[]> => {
+    const res = await tmdbClient.get(`/movie/${id}/similar`);
+    return res.data.results || [];
   },
 
   // TV Shows
-  getPopularTV: async (page = 1) => {
-    const res = await apiClient.get<{ success: boolean; data: { results: TVShow[] } }>(`/tv/popular?page=${page}`);
-    return res.data.data.results;
+  getPopularTV: async (page = 1): Promise<TVShow[]> => {
+    const res = await tmdbClient.get('/tv/popular', { params: { page } });
+    return res.data.results || [];
   },
-  getTopRatedTV: async (page = 1) => {
-    const res = await apiClient.get<{ success: boolean; data: { results: TVShow[] } }>(`/tv/top-rated?page=${page}`);
-    return res.data.data.results;
+  getTopRatedTV: async (page = 1): Promise<TVShow[]> => {
+    const res = await tmdbClient.get('/tv/top_rated', { params: { page } });
+    return res.data.results || [];
   },
-  getTVDetails: async (id: number) => {
-    const res = await apiClient.get<{ success: boolean; data: TVShow }>(`/tv/${id}`);
-    return res.data.data;
+  getTVDetails: async (id: number): Promise<TVShow> => {
+    const res = await tmdbClient.get(`/tv/${id}`);
+    return res.data;
   },
-  getTVSeason: async (id: number, season: number) => {
-    const res = await apiClient.get<{ success: boolean; data: SeasonDetails }>(`/tv/${id}/season/${season}`);
-    return res.data.data;
+  getTVSeason: async (id: number, season: number): Promise<SeasonDetails> => {
+    const res = await tmdbClient.get(`/tv/${id}/season/${season}`);
+    return res.data;
   },
-  getTVCredits: async (id: number) => {
-    const res = await apiClient.get<{ success: boolean; data: MediaCredits }>(`/tv/${id}/credits`);
-    return res.data.data;
+  getTVCredits: async (id: number): Promise<MediaCredits> => {
+    const res = await tmdbClient.get(`/tv/${id}/credits`);
+    return res.data;
   },
 
   // Search
-  search: async (query: string, page = 1) => {
-    const res = await apiClient.get<{ success: boolean; data: { results: (Movie | TVShow)[] } }>(`/search?q=${encodeURIComponent(query)}&page=${page}`);
-    return res.data.data.results;
+  search: async (query: string, page = 1): Promise<(Movie | TVShow)[]> => {
+    const res = await tmdbClient.get('/search/multi', { params: { query, page } });
+    return (res.data.results || []).filter((item: any) => item.media_type === 'movie' || item.media_type === 'tv');
   },
 
-  // Playback
-  getMovieStream: async (id: number) => {
-    const res = await apiClient.get<{ success: boolean; data: PlaybackResponse }>(`/play/movie/${id}`);
-    return res.data.data;
-  },
-  getEpisodeStream: async (id: number, season: number, episode: number) => {
-    const res = await apiClient.get<{ success: boolean; data: PlaybackResponse }>(`/play/tv/${id}/${season}/${episode}`);
-    return res.data.data;
-  },
-
-  // Watchlist
-  getWatchlist: async () => {
-    const res = await apiClient.get<{ success: boolean; data: WatchlistItem[] }>('/watchlist');
-    return res.data.data;
-  },
-  addToWatchlist: async (item: { tmdbId: number; mediaType: 'movie' | 'tv'; title: string; posterPath: string | null; voteAverage?: number }) => {
-    const res = await apiClient.post<{ success: boolean; data: WatchlistItem }>('/watchlist', item);
-    return res.data.data;
-  },
-  removeFromWatchlist: async (id: string) => {
-    const res = await apiClient.delete(`/watchlist/${id}`);
-    return res.data;
-  },
-  syncWatchlist: async (items: any[]) => {
-    const res = await apiClient.post<{ success: boolean; data: WatchlistItem[] }>('/watchlist/sync', { items });
-    return res.data.data;
+  // Playback Stream Generation (Client-Side)
+  getMovieStream: async (id: number): Promise<PlaybackResponse> => {
+    const servers = generateServers(id);
+    return {
+      tmdbId: id,
+      title: `Movie ${id}`,
+      mediaType: 'movie',
+      servers,
+      sources: defaultSources,
+      subtitles: [
+        {
+          label: 'English',
+          lang: 'en',
+          url: 'https://raw.githubusercontent.com/brenopolanski/html5-video-webvtt-example/master/subtitles/subtitles-en.vtt',
+          default: true,
+        },
+        {
+          label: 'Spanish',
+          lang: 'es',
+          url: 'https://raw.githubusercontent.com/brenopolanski/html5-video-webvtt-example/master/subtitles/subtitles-es.vtt',
+        },
+      ],
+    };
   },
 
-  // History
-  getHistory: async () => {
-    const res = await apiClient.get<{ success: boolean; data: WatchHistoryItem[] }>('/history');
-    return res.data.data;
+  getEpisodeStream: async (id: number, season: number, episode: number): Promise<PlaybackResponse> => {
+    const servers = generateServers(id, season, episode);
+    return {
+      tmdbId: id,
+      title: `TV ${id} S${season}E${episode}`,
+      mediaType: 'tv',
+      season,
+      episode,
+      servers,
+      sources: defaultSources,
+      subtitles: [
+        {
+          label: 'English',
+          lang: 'en',
+          url: 'https://raw.githubusercontent.com/brenopolanski/html5-video-webvtt-example/master/subtitles/subtitles-en.vtt',
+          default: true,
+        },
+      ],
+    };
+  },
+
+  // Watchlist (localStorage)
+  getWatchlist: async (): Promise<WatchlistItem[]> => {
+    return guestStorage.getWatchlist();
+  },
+  addToWatchlist: async (item: { tmdbId: number; mediaType: 'movie' | 'tv'; title: string; posterPath: string | null; voteAverage?: number }): Promise<WatchlistItem> => {
+    guestStorage.toggleWatchlist(item);
+    return {
+      id: `local_${item.tmdbId}`,
+      tmdbId: item.tmdbId,
+      mediaType: item.mediaType,
+      title: item.title,
+      posterPath: item.posterPath,
+      voteAverage: item.voteAverage,
+      createdAt: new Date().toISOString(),
+    };
+  },
+  removeFromWatchlist: async (id: string): Promise<{ success: boolean }> => {
+    const numericId = parseInt(id.replace('local_', '').replace('guest_', ''), 10);
+    if (!isNaN(numericId)) {
+      guestStorage.toggleWatchlist({ tmdbId: numericId, mediaType: 'movie', title: '', posterPath: null });
+    }
+    return { success: true };
+  },
+  syncWatchlist: async (items: any[]) => items,
+
+  // History (localStorage)
+  getHistory: async (): Promise<WatchHistoryItem[]> => {
+    return guestStorage.getHistory();
   },
   updateHistory: async (item: {
     tmdbId: number;
@@ -117,30 +243,20 @@ export const api = {
     episode?: number | null;
     progress: number;
     duration: number;
-  }) => {
-    const res = await apiClient.post<{ success: boolean; data: WatchHistoryItem }>('/history', item);
-    return res.data.data;
+  }): Promise<WatchHistoryItem> => {
+    guestStorage.saveHistory(item);
+    return {
+      ...item,
+      updatedAt: new Date().toISOString(),
+    };
   },
-  deleteHistory: async (id: string) => {
-    const res = await apiClient.delete(`/history/${id}`);
-    return res.data;
+  deleteHistory: async (_id: string): Promise<{ success: boolean }> => {
+    return { success: true };
   },
-  syncHistory: async (items: any[]) => {
-    const res = await apiClient.post<{ success: boolean; data: WatchHistoryItem[] }>('/history/sync', { items });
-    return res.data.data;
-  },
+  syncHistory: async (items: any[]) => items,
 
-  // Auth
-  register: async (data: { email: string; password: string; name?: string }) => {
-    const res = await apiClient.post<{ success: boolean; data: { user: UserProfile; token: string } }>('/auth/register', data);
-    return res.data.data;
-  },
-  login: async (data: { email: string; password: string }) => {
-    const res = await apiClient.post<{ success: boolean; data: { user: UserProfile; token: string } }>('/auth/login', data);
-    return res.data.data;
-  },
-  getProfile: async () => {
-    const res = await apiClient.get<{ success: boolean; data: UserProfile }>('/auth/profile');
-    return res.data.data;
-  },
+  // Auth mock for graceful transition
+  register: async () => ({ user: null, token: '' }),
+  login: async () => ({ user: null, token: '' }),
+  getProfile: async () => null,
 };
