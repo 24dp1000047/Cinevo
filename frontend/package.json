@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",
+    "postbuild": "node scripts/clean-cache.js",
     "build:worker": "opennextjs-cloudflare build",
     "build:pages": "opennextjs-cloudflare build && node scripts/prepare-pages.js",
     "start": "next start -p 3000",
