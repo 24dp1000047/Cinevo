@@ -44,9 +44,9 @@ export function MovieCard({ item, mediaType, priority = false }: MovieCardProps)
   const watchUrl = `/watch/${type}/${item.id}`;
 
   return (
-    <div className="group relative flex-shrink-0 w-40 sm:w-48 md:w-52 select-none transition-all duration-300 hover:scale-[1.04] hover:z-20">
+    <div className="group/card relative flex-shrink-0 w-40 sm:w-48 md:w-52 select-none transition-all duration-300 hover:scale-[1.04] hover:z-20">
       {/* Poster Media Box */}
-      <div className="relative aspect-[2/3] w-full rounded-xl overflow-hidden bg-zinc-900 shadow-lg border border-white/5 group-hover:border-red-500/30 transition-colors">
+      <div className="relative aspect-[2/3] w-full rounded-xl overflow-hidden bg-zinc-900 shadow-lg border border-white/5 group-hover/card:border-red-500/30 transition-colors">
         <Link href={detailsUrl} className="absolute inset-0 z-0" aria-label={title}>
           <Image
             src={posterUrl}
@@ -54,12 +54,12 @@ export function MovieCard({ item, mediaType, priority = false }: MovieCardProps)
             fill
             sizes="(max-width: 640px) 160px, (max-width: 768px) 192px, 208px"
             priority={priority}
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            className="object-cover transition-transform duration-500 group-hover/card:scale-105"
           />
         </Link>
 
         {/* Hover Action Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3 pointer-events-none z-10">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3 pointer-events-none z-10">
           <div className="flex items-center gap-2 mb-2 pointer-events-auto">
             <Link
               href={watchUrl}
@@ -94,7 +94,7 @@ export function MovieCard({ item, mediaType, priority = false }: MovieCardProps)
       </div>
 
       <div className="mt-2 px-1">
-        <Link href={detailsUrl} className="block font-medium text-sm text-zinc-200 truncate group-hover:text-white transition">
+        <Link href={detailsUrl} className="block font-medium text-sm text-zinc-200 truncate group-hover/card:text-white transition">
           {title}
         </Link>
         <div className="flex items-center justify-between text-xs text-zinc-400 mt-0.5">

@@ -21,7 +21,8 @@ const generateServers = (tmdbId: number, season?: number, episode?: number): Str
     {
       id: 'vidlink',
       name: '#1 VidLink Pro',
-      quality: '1080p HD',
+      quality: '1080p Ultra',
+      features: 'Ultra-fast CDN, direct timeline seeking API',
       type: 'embed',
       icon: 'zap',
       url: isTV
@@ -32,6 +33,7 @@ const generateServers = (tmdbId: number, season?: number, episode?: number): Str
       id: 'vidsrc-su',
       name: '#2 VidSrc.su',
       quality: '1080p Ultra',
+      features: 'Multi-audio tracks & multi-language subtitles',
       type: 'embed',
       icon: 'globe',
       url: isTV
@@ -40,8 +42,9 @@ const generateServers = (tmdbId: number, season?: number, episode?: number): Str
     },
     {
       id: 'autoembed',
-      name: '#3 AutoEmbed.cc',
+      name: '#3 AutoEmbed.co',
       quality: '1080p HD',
+      features: 'Fast TMDB-indexed stream fallback',
       type: 'embed',
       icon: 'radio',
       url: isTV
@@ -52,6 +55,7 @@ const generateServers = (tmdbId: number, season?: number, episode?: number): Str
       id: 'vidsrc-me',
       name: '#4 VidSrc.me',
       quality: '1080p HD',
+      features: 'Deep international catalog archive',
       type: 'embed',
       icon: 'play',
       url: isTV
@@ -62,6 +66,7 @@ const generateServers = (tmdbId: number, season?: number, episode?: number): Str
       id: 'smashy',
       name: '#5 SmashyStream',
       quality: '1080p HD',
+      features: 'High-uptime backup mirrors',
       type: 'embed',
       icon: 'layers',
       url: isTV
@@ -71,7 +76,8 @@ const generateServers = (tmdbId: number, season?: number, episode?: number): Str
     {
       id: 'embed-su',
       name: '#6 Embed.su',
-      quality: '1080p HD',
+      quality: '1080p / 4K',
+      features: '4K streams with automated subtitle rendering',
       type: 'embed',
       icon: 'sparkles',
       url: isTV
@@ -79,9 +85,32 @@ const generateServers = (tmdbId: number, season?: number, episode?: number): Str
         : `https://embed.su/embed/movie/${tmdbId}`,
     },
     {
+      id: 'multiembed',
+      name: '#7 MultiEmbed',
+      quality: '1080p HD',
+      features: 'Deep catalog archive & classic releases',
+      type: 'embed',
+      icon: 'monitor',
+      url: isTV
+        ? `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&s=${s}&e=${e}`
+        : `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1`,
+    },
+    {
+      id: 'vidking',
+      name: '#8 VidKing',
+      quality: '1080p HD',
+      features: 'Interactive tracker & seamless stream backup',
+      type: 'embed',
+      icon: 'flame',
+      url: isTV
+        ? `https://vidking.net/embed/tv/${tmdbId}/${s}/${e}`
+        : `https://vidking.net/embed/movie/${tmdbId}`,
+    },
+    {
       id: 'native-hls',
-      name: '#7 Cinevo Direct',
+      name: '#9 Cinevo Direct',
       quality: 'Direct HLS',
+      features: 'Adaptive bitrate cinema player (M3U8)',
       type: 'hls',
       icon: 'server',
       url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
@@ -128,6 +157,12 @@ export const api = {
   },
   getSimilarMovies: async (id: number): Promise<Movie[]> => {
     const res = await tmdbClient.get(`/movie/${id}/similar`);
+    return res.data.results || [];
+  },
+  getMoviesByGenre: async (genreId: number, page = 1): Promise<Movie[]> => {
+    const res = await tmdbClient.get('/discover/movie', {
+      params: { with_genres: genreId, sort_by: 'popularity.desc', page },
+    });
     return res.data.results || [];
   },
 

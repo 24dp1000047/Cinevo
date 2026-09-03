@@ -10,6 +10,7 @@ import {
   useTopRatedMovies,
   usePopularTV,
   useTopRatedTV,
+  useMoviesByGenre,
   useHistory,
 } from '../hooks/useMedia';
 import { HeroBanner } from '../components/hero/HeroBanner';
@@ -23,6 +24,9 @@ export default function HomePage() {
   const { data: topRatedMovies = [], isLoading: isTopMoviesLoading } = useTopRatedMovies();
   const { data: popularTV = [], isLoading: isPopTVLoading } = usePopularTV();
   const { data: topRatedTV = [], isLoading: isTopTVLoading } = useTopRatedTV();
+  const { data: actionMovies = [], isLoading: isActionLoading } = useMoviesByGenre(28);
+  const { data: scifiMovies = [], isLoading: isScifiLoading } = useMoviesByGenre(878);
+  const { data: comedyMovies = [], isLoading: isComedyLoading } = useMoviesByGenre(35);
   const { data: history = [] } = useHistory();
 
   const heroItem = trending[0] || popularMovies[0];
@@ -87,7 +91,7 @@ export default function HomePage() {
       )}
 
       {/* Rows */}
-      <div className="-mt-12 md:-mt-20 relative z-20 space-y-4 pb-16">
+      <div className="-mt-12 md:-mt-20 relative z-20 space-y-4 pb-4">
         <MovieRow
           title="Trending Now"
           items={trending}
@@ -120,6 +124,27 @@ export default function HomePage() {
           items={topRatedTV}
           mediaType="tv"
           isLoading={isTopTVLoading}
+        />
+
+        <MovieRow
+          title="High-Octane Action & Adventure"
+          items={actionMovies}
+          mediaType="movie"
+          isLoading={isActionLoading}
+        />
+
+        <MovieRow
+          title="Sci-Fi & Cosmic Worlds"
+          items={scifiMovies}
+          mediaType="movie"
+          isLoading={isScifiLoading}
+        />
+
+        <MovieRow
+          title="Feel-Good Comedies"
+          items={comedyMovies}
+          mediaType="movie"
+          isLoading={isComedyLoading}
         />
       </div>
     </div>

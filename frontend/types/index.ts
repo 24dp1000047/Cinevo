@@ -98,9 +98,10 @@ export interface StreamServer {
   id: string;
   name: string;
   quality?: string;
+  features?: string;
   type: 'embed' | 'hls' | 'mp4';
   url: string;
-  icon?: 'zap' | 'globe' | 'radio' | 'play' | 'layers' | 'sparkles' | 'server';
+  icon?: 'zap' | 'globe' | 'radio' | 'play' | 'layers' | 'sparkles' | 'server' | 'monitor' | 'flame';
 }
 
 export interface PlaybackResponse {

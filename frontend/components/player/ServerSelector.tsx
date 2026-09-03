@@ -11,6 +11,8 @@ import {
   Sparkles,
   Check,
   Film,
+  Monitor,
+  Flame,
 } from 'lucide-react';
 import { StreamServer } from '../../types';
 
@@ -42,6 +44,10 @@ export function ServerSelector({
         return <Layers className={iconClass} />;
       case 'sparkles':
         return <Sparkles className={iconClass} />;
+      case 'monitor':
+        return <Monitor className={iconClass} />;
+      case 'flame':
+        return <Flame className={iconClass} />;
       case 'server':
       default:
         return <Film className={iconClass} />;
@@ -67,6 +73,7 @@ export function ServerSelector({
             <button
               key={server.id}
               onClick={() => onSelectServer(server)}
+              title={server.features ? `${server.name} — ${server.features}` : server.name}
               className={`group flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 flex-shrink-0 cursor-pointer ${
                 isActive
                   ? 'bg-brand-red text-white shadow-lg shadow-red-900/40 scale-[1.02]'

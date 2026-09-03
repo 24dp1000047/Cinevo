@@ -23,6 +23,14 @@ export function useTopRatedMovies(page = 1) {
   });
 }
 
+export function useMoviesByGenre(genreId: number, page = 1) {
+  return useQuery({
+    queryKey: ['movies', 'genre', genreId, page],
+    queryFn: () => api.getMoviesByGenre(genreId, page),
+    enabled: Boolean(genreId),
+  });
+}
+
 export function useMovieDetails(id: number) {
   return useQuery({
     queryKey: ['movie', id],

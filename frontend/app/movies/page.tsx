@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { api } from '../../lib/api';
 import { Movie } from '../../types';
 import { MovieCard } from '../../components/movie-card/MovieCard';
 import { MovieCardSkeleton } from '../../components/ui/Skeleton';
-import { Film, Loader2, ChevronDown } from 'lucide-react';
+import { Film, Loader2 } from 'lucide-react';
 
 export default function MoviesPage() {
   const [tab, setTab] = useState<'popular' | 'topRated' | 'trending'>('popular');
@@ -14,6 +14,7 @@ export default function MoviesPage() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   // Fetch initial page on tab change
   useEffect(() => {
@@ -45,8 +46,8 @@ export default function MoviesPage() {
     };
   }, [tab]);
 
-  const handleLoadMore = async () => {
-    if (isLoadingMore || !hasMore) return;
+  const handleLoadMore = useCallback(async () => {
+    if (isLoadingMore || !hasMore || isLoading) return;
     setIsLoadingMore(true);
     const nextPage = page + 1;
     try {
@@ -70,7 +71,26 @@ export default function MoviesPage() {
     } finally {
       setIsLoadingMore(false);
     }
-  };
+  }, [isLoadingMore, hasMore, isLoading, page, tab]);
+
+  // Infinite scroll observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          handleLoadMore();
+        }
+      },
+      { rootMargin: '400px' }
+    );
+
+    const el = sentinelRef.current;
+    if (el) observer.observe(el);
+
+    return () => {
+      if (el) observer.unobserve(el);
+    };
+  }, [handleLoadMore]);
 
   return (
     <div className="pt-24 pb-20 px-4 md:px-12 max-w-7xl mx-auto min-h-screen">
@@ -129,26 +149,15 @@ export default function MoviesPage() {
             ))}
           </div>
 
-          {/* Load More Button */}
+          {/* Infinite Scroll Sentinel & Loading Indicator */}
           {hasMore && (
-            <div className="mt-12 flex justify-center pb-8">
-              <button
-                onClick={handleLoadMore}
-                disabled={isLoadingMore}
-                className="flex items-center gap-2 px-8 py-3.5 rounded-xl bg-zinc-800/80 hover:bg-zinc-700 text-white font-medium border border-white/10 hover:border-white/20 transition-all shadow-lg hover:scale-105 active:scale-95 disabled:opacity-50"
-              >
-                {isLoadingMore ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin text-brand-red" />
-                    <span>Loading more movies...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Load More Movies</span>
-                    <ChevronDown className="w-4 h-4" />
-                  </>
-                )}
-              </button>
+            <div ref={sentinelRef} className="mt-12 flex justify-center pb-8 min-h-[60px]">
+              {isLoadingMore && (
+                <div className="flex items-center gap-2.5 px-6 py-3 rounded-full bg-zinc-900/90 border border-white/10 text-zinc-300 text-sm font-medium shadow-xl backdrop-blur-md">
+                  <Loader2 className="w-5 h-5 animate-spin text-brand-red" />
+                  <span>Loading more movies...</span>
+                </div>
+              )}
             </div>
           )}
         </>
