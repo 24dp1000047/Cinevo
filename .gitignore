@@ -34,3 +34,4 @@ dev.db
 *.pem
 .idea/
 .vscode/
+.wrangler/

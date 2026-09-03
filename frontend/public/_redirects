@@ -1,0 +1,3 @@
+/movie/*  /movie/1  200
+/tv/*     /tv/1     200
+/watch/*  /watch/movie/1 200
