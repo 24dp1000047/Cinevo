@@ -5,8 +5,8 @@
   "description": "Cinevo - Standalone Streaming Platform",
   "scripts": {
     "dev": "npm run dev --prefix frontend",
-    "build": "npm --prefix frontend install && npm --prefix frontend run build",
-    "build:pages": "npm --prefix frontend install && npm --prefix frontend run build",
+    "build": "npm --prefix frontend install && npm --prefix frontend run build && node scripts/sync-pages-output.js",
+    "build:pages": "npm --prefix frontend install && npm --prefix frontend run build && node scripts/sync-pages-output.js",
     "start": "npm run start --prefix frontend",
     "install:all": "npm --prefix frontend install"
   },
