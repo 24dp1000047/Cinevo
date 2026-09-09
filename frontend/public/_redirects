@@ -4,10 +4,11 @@
 /movie/*.txt        /movie/:splat.txt        200
 /tv/*.txt           /tv/:splat.txt           200
 
-# Client-side dynamic routing fallbacks (clean extensionless paths - NO .html)
-/watch/movie/*      /watch/movie/550         200
-/watch/tv/*         /watch/tv/1399           200
-/watch/*            /watch/movie/550         200
-/movie/*            /movie/550               200
-/tv/*               /tv/1399                 200
+# Client-side dynamic routing fallbacks to non-conflicting dedicated shell paths
+/watch/movie/*      /fallback/watch-movie    200
+/watch/tv/*         /fallback/watch-tv       200
+/watch/*            /fallback/watch-movie    200
+/movie/*            /fallback/movie          200
+/tv/*               /fallback/tv             200
+
 
