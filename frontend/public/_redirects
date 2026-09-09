@@ -1,3 +1,6 @@
-/movie/*  /movie/550  200
-/tv/*     /tv/1399    200
-/watch/*  /watch/movie/550 200
+/watch/movie/*  /watch/movie/550.html  200
+/watch/tv/*     /watch/tv/1399.html    200
+/watch/*        /watch/movie/550.html  200
+/movie/*        /movie/550.html        200
+/tv/*           /tv/1399.html          200
+/*              /index.html            200

@@ -36,12 +36,12 @@ export default function WatchClient({
       const match = window.location.pathname.match(/\/watch\/(movie|tv)\/([^/?#]+)/);
       if (match) {
         const parsed = parseInt(match[2], 10);
-        if (!isNaN(parsed) && parsed > 1) return parsed;
+        if (!isNaN(parsed) && parsed > 0) return parsed;
       }
     }
     const rawId = propId || (clientParams?.id as string);
     const parsed = rawId ? parseInt(rawId, 10) : 550;
-    return !isNaN(parsed) && parsed > 1 ? parsed : 550;
+    return !isNaN(parsed) && parsed > 0 ? parsed : 550;
   });
 
   useEffect(() => {
@@ -49,7 +49,7 @@ export default function WatchClient({
       const match = window.location.pathname.match(/\/watch\/(movie|tv)\/([^/?#]+)/);
       if (match) {
         const parsed = parseInt(match[2], 10);
-        if (!isNaN(parsed) && parsed > 1) {
+        if (!isNaN(parsed) && parsed > 0) {
           setResolvedType(match[1] as 'movie' | 'tv');
           setResolvedId(parsed);
         }
@@ -78,8 +78,8 @@ export default function WatchClient({
   // Watch history tracking
   const { saveProgress } = useHistory();
 
-  // Active Server State
-  const [activeServerId, setActiveServerId] = useState<string>('vidlink');
+  // Active Server State (VidKing Ultra default for rock-solid 1080p stream playback)
+  const [activeServerId, setActiveServerId] = useState<string>('vidking');
   const [isIframeLoading, setIsIframeLoading] = useState<boolean>(true);
 
   // Auto-record progress to localStorage history so "Continue Watching" works on any server
@@ -208,8 +208,8 @@ export default function WatchClient({
                   src={activeServer.url}
                   title={title}
                   allowFullScreen
-                  allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-                  referrerPolicy="origin"
+                  allow="autoplay; encrypted-media; picture-in-picture; fullscreen; clipboard-write; screen-wake-lock"
+                  referrerPolicy="no-referrer"
                   onLoad={() => setIsIframeLoading(false)}
                   className="w-full h-full border-0"
                 />

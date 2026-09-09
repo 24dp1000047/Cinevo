@@ -18,12 +18,12 @@ export default function TVDetailsClient({ id }: { id?: string }) {
       const match = window.location.pathname.match(/\/tv\/(\d+)/);
       if (match) {
         const parsed = parseInt(match[1], 10);
-        if (!isNaN(parsed) && parsed > 1) return parsed;
+        if (!isNaN(parsed) && parsed > 0) return parsed;
       }
     }
     const rawId = id || (clientParams?.id as string);
     const parsed = rawId ? parseInt(rawId, 10) : 1399;
-    return !isNaN(parsed) && parsed > 1 ? parsed : 1399;
+    return !isNaN(parsed) && parsed > 0 ? parsed : 1399;
   });
   const [isTrailerOpen, setIsTrailerOpen] = useState(false);
 
@@ -32,7 +32,7 @@ export default function TVDetailsClient({ id }: { id?: string }) {
       const match = window.location.pathname.match(/\/tv\/(\d+)/);
       if (match) {
         const parsed = parseInt(match[1], 10);
-        if (!isNaN(parsed) && parsed > 1) setResolvedId(parsed);
+        if (!isNaN(parsed) && parsed > 0) setResolvedId(parsed);
       }
     }
   }, []);
