@@ -2,7 +2,10 @@ import { Suspense } from 'react';
 import WatchClient from './WatchClient';
 
 export function generateStaticParams() {
-  return [{ type: 'movie', id: '1' }];
+  return [
+    { type: 'movie', id: '550' },
+    { type: 'tv', id: '1399' },
+  ];
 }
 
 export default async function WatchPage({

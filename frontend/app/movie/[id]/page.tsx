@@ -1,7 +1,7 @@
 import MovieDetailsClient from './MovieDetailsClient';
 
 export function generateStaticParams() {
-  return [{ id: '1' }];
+  return [{ id: '550' }];
 }
 
 export default async function MovieDetailsPage({ params }: { params: Promise<{ id: string }> }) {

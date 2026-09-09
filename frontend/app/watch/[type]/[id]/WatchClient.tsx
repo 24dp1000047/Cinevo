@@ -21,23 +21,38 @@ export default function WatchClient({
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // Route parameters with Cloudflare Pages SPA rewrite fallback
+  // Route parameters with Cloudflare Pages SPA rewrite fallback (synchronous check)
   const [resolvedType, setResolvedType] = useState<'movie' | 'tv'>(() => {
+    if (typeof window !== 'undefined') {
+      const match = window.location.pathname.match(/\/watch\/(movie|tv)\/([^/?#]+)/);
+      if (match) return match[1] as 'movie' | 'tv';
+    }
     const rawType = type || (clientParams?.type as string) || 'movie';
     return rawType === 'tv' ? 'tv' : 'movie';
   });
 
   const [resolvedId, setResolvedId] = useState<number>(() => {
-    const rawId = propId || (clientParams?.id as string) || '1';
-    return parseInt(rawId, 10);
+    if (typeof window !== 'undefined') {
+      const match = window.location.pathname.match(/\/watch\/(movie|tv)\/([^/?#]+)/);
+      if (match) {
+        const parsed = parseInt(match[2], 10);
+        if (!isNaN(parsed) && parsed > 1) return parsed;
+      }
+    }
+    const rawId = propId || (clientParams?.id as string);
+    const parsed = rawId ? parseInt(rawId, 10) : 550;
+    return !isNaN(parsed) && parsed > 1 ? parsed : 550;
   });
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const match = window.location.pathname.match(/\/watch\/(movie|tv)\/(\d+)/);
+      const match = window.location.pathname.match(/\/watch\/(movie|tv)\/([^/?#]+)/);
       if (match) {
-        setResolvedType(match[1] as 'movie' | 'tv');
-        setResolvedId(parseInt(match[2], 10));
+        const parsed = parseInt(match[2], 10);
+        if (!isNaN(parsed) && parsed > 1) {
+          setResolvedType(match[1] as 'movie' | 'tv');
+          setResolvedId(parsed);
+        }
       }
     }
   }, []);
@@ -212,9 +227,32 @@ export default function WatchClient({
           </div>
         )}
 
-        {/* Server Selector Bar */}
+        {/* Server Selector Bar & Quick Failover Helper */}
         {playback?.servers && playback.servers.length > 0 && (
-          <div className="mt-3 px-3 md:px-0">
+          <div className="mt-3 px-3 md:px-0 space-y-2">
+            <div className="flex flex-wrap items-center justify-between gap-2 px-3.5 py-2 bg-zinc-900/60 rounded-xl border border-white/5 text-xs text-zinc-400">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Playing on <strong className="text-zinc-200">{activeServer?.name}</strong></span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="hidden sm:inline text-zinc-500">Buffering or server error?</span>
+                <button
+                  onClick={() => {
+                    const currentIndex = playback.servers.findIndex((s) => s.id === activeServerId);
+                    const nextServer = playback.servers[(currentIndex + 1) % playback.servers.length];
+                    if (nextServer) {
+                      setIsIframeLoading(true);
+                      setActiveServerId(nextServer.id);
+                    }
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-red-600/20 text-brand-red border border-red-500/30 font-bold hover:bg-brand-red hover:text-white transition flex items-center gap-1"
+                >
+                  <span>Next Server ⟳</span>
+                </button>
+              </div>
+            </div>
+
             <ServerSelector
               servers={playback.servers}
               activeServerId={activeServerId}

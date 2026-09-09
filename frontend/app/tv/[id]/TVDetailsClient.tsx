@@ -14,8 +14,16 @@ import { TrailerModal } from '../../../components/trailer/TrailerModal';
 export default function TVDetailsClient({ id }: { id?: string }) {
   const clientParams = useParams();
   const [resolvedId, setResolvedId] = useState<number>(() => {
-    const rawId = id || (clientParams?.id as string) || '1';
-    return parseInt(rawId, 10);
+    if (typeof window !== 'undefined') {
+      const match = window.location.pathname.match(/\/tv\/(\d+)/);
+      if (match) {
+        const parsed = parseInt(match[1], 10);
+        if (!isNaN(parsed) && parsed > 1) return parsed;
+      }
+    }
+    const rawId = id || (clientParams?.id as string);
+    const parsed = rawId ? parseInt(rawId, 10) : 1399;
+    return !isNaN(parsed) && parsed > 1 ? parsed : 1399;
   });
   const [isTrailerOpen, setIsTrailerOpen] = useState(false);
 
@@ -23,7 +31,8 @@ export default function TVDetailsClient({ id }: { id?: string }) {
     if (typeof window !== 'undefined') {
       const match = window.location.pathname.match(/\/tv\/(\d+)/);
       if (match) {
-        setResolvedId(parseInt(match[1], 10));
+        const parsed = parseInt(match[1], 10);
+        if (!isNaN(parsed) && parsed > 1) setResolvedId(parsed);
       }
     }
   }, []);

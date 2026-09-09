@@ -1,7 +1,7 @@
 import TVDetailsClient from './TVDetailsClient';
 
 export function generateStaticParams() {
-  return [{ id: '1' }];
+  return [{ id: '1399' }];
 }
 
 export default async function TVDetailsPage({ params }: { params: Promise<{ id: string }> }) {
