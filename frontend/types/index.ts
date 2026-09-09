@@ -152,3 +152,36 @@ export interface UserProfile {
     enableSubtitles: boolean;
   };
 }
+
+export interface Genre {
+  id: number;
+  name: string;
+}
+
+export type DiscoverSortOption =
+  | 'popularity.desc'
+  | 'popularity.asc'
+  | 'vote_average.desc'
+  | 'primary_release_date.desc'
+  | 'revenue.desc';
+
+export interface DiscoverFilters {
+  mediaType: 'movie' | 'tv';
+  genres?: number[];
+  sortBy?: DiscoverSortOption;
+  year?: number | string;
+  yearRange?: string;
+  minRating?: number;
+  page?: number;
+}
+
+export interface VideoResult {
+  id: string;
+  key: string;
+  name: string;
+  site: string;
+  size: number;
+  type: string;
+  official: boolean;
+  published_at: string;
+}

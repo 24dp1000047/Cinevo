@@ -22,8 +22,21 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Global Ctrl+K or Cmd+K shortcut for search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsSearchOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const navLinks = [
     { name: 'Home', href: '/' },
+    { name: 'Discover', href: '/discover' },
     { name: 'Movies', href: '/movies' },
     { name: 'Series', href: '/series' },
     { name: 'My List', href: '/my-list', badge: watchlist.length > 0 ? watchlist.length : undefined },
@@ -78,13 +91,17 @@ export function Navbar() {
 
           {/* Right: Search, My List & Preferences */}
           <div className="flex items-center gap-3">
-            {/* Search Button */}
+            {/* Search Button with Hotkey Pill */}
             <button
               onClick={() => setIsSearchOpen(true)}
-              className="flex items-center gap-2 p-2.5 rounded-full hover:bg-white/10 text-zinc-300 hover:text-white transition"
-              title="Search"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 hover:text-white transition group"
+              title="Search (Ctrl+K)"
             >
-              <Search className="w-5 h-5" />
+              <Search className="w-4 h-4 text-zinc-400 group-hover:text-white transition" />
+              <span className="hidden md:inline text-xs text-zinc-400 group-hover:text-zinc-200">Search</span>
+              <kbd className="hidden lg:inline-flex items-center text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-800/80 text-zinc-400 border border-white/10">
+                ⌘K
+              </kbd>
             </button>
 
             {/* Quick My List Link */}

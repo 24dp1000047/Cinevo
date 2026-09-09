@@ -34,7 +34,14 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      {isTrendingLoading ? <HeroSkeleton /> : <HeroBanner item={heroItem} />}
+      {isTrendingLoading ? (
+        <HeroSkeleton />
+      ) : (
+        <HeroBanner
+          items={trending.length > 0 ? trending.slice(0, 5) : popularMovies.slice(0, 5)}
+          item={heroItem}
+        />
+      )}
 
       {/* Continue Watching Section (Active guest/user progress) */}
       {history.length > 0 && (

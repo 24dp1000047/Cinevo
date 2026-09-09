@@ -15,7 +15,7 @@ export default function HistoryPage() {
 
   const handleClear = () => {
     if (confirm('Are you sure you want to clear your watch history?')) {
-      guestStorage.clearGuestData();
+      guestStorage.clearHistory();
       queryClient.invalidateQueries({ queryKey: ['history'] });
     }
   };

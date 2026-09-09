@@ -105,6 +105,16 @@ export const guestStorage = {
     }
   },
 
+  clearHistory: (): void => {
+    if (typeof window === 'undefined') return;
+    localStorage.removeItem(HISTORY_KEY);
+  },
+
+  clearWatchlist: (): void => {
+    if (typeof window === 'undefined') return;
+    localStorage.removeItem(WATCHLIST_KEY);
+  },
+
   clearGuestData: (): void => {
     if (typeof window === 'undefined') return;
     localStorage.removeItem(HISTORY_KEY);

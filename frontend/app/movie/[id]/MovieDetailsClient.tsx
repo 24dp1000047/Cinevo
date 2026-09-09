@@ -1,19 +1,34 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { Play, Plus, Check, Star, Clock, Calendar, ArrowLeft } from 'lucide-react';
+import { Play, Plus, Check, Star, Clock, Calendar, ArrowLeft, Film } from 'lucide-react';
 import { useMovieDetails, useMovieCredits, useSimilarMovies, useWatchlist } from '../../../hooks/useMedia';
 import { getTmdbImageUrl, formatMinutes, formatReleaseYear, formatScore } from '../../../lib/utils';
 import { MovieCard } from '../../../components/movie-card/MovieCard';
 import { Skeleton } from '../../../components/ui/Skeleton';
+import { TrailerModal } from '../../../components/trailer/TrailerModal';
 
 export default function MovieDetailsClient({ id }: { id?: string }) {
   const clientParams = useParams();
-  const rawId = id || (clientParams?.id as string) || '1';
-  const movieId = parseInt(rawId, 10);
+  const [resolvedId, setResolvedId] = useState<number>(() => {
+    const rawId = id || (clientParams?.id as string) || '1';
+    return parseInt(rawId, 10);
+  });
+  const [isTrailerOpen, setIsTrailerOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const match = window.location.pathname.match(/\/movie\/(\d+)/);
+      if (match) {
+        setResolvedId(parseInt(match[1], 10));
+      }
+    }
+  }, []);
+
+  const movieId = resolvedId;
 
   const { data: movie, isLoading: isMovieLoading } = useMovieDetails(movieId);
   const { data: credits } = useMovieCredits(movieId);
@@ -117,9 +132,24 @@ export default function MovieDetailsClient({ id }: { id?: string }) {
             </h1>
 
             {movie.tagline && (
-              <p className="text-base sm:text-lg italic text-zinc-400 mb-4 font-normal">
+              <p className="text-base sm:text-lg italic text-zinc-400 mb-3 font-normal">
                 &ldquo;{movie.tagline}&rdquo;
               </p>
+            )}
+
+            {/* Clickable Genre Pills */}
+            {movie.genres && movie.genres.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2 mb-6">
+                {movie.genres.map((genre) => (
+                  <Link
+                    key={genre.id}
+                    href={`/discover?type=movie&genre=${genre.id}`}
+                    className="px-3 py-1 rounded-full text-xs font-semibold bg-zinc-800/80 hover:bg-red-600/20 hover:text-brand-red border border-white/10 hover:border-red-500/30 text-zinc-300 transition"
+                  >
+                    {genre.name}
+                  </Link>
+                ))}
+              </div>
             )}
 
             {/* Synopsis */}
@@ -134,18 +164,26 @@ export default function MovieDetailsClient({ id }: { id?: string }) {
             <div className="flex flex-wrap items-center gap-4 mb-8">
               <Link
                 href={`/watch/movie/${movie.id}`}
-                className="flex items-center gap-2.5 px-8 py-3.5 rounded-xl bg-brand-red hover:bg-red-700 text-white font-semibold transition shadow-xl shadow-red-900/30 hover:scale-105"
+                className="flex items-center gap-2.5 px-8 py-3.5 rounded-xl bg-gradient-to-r from-brand-red to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold transition shadow-xl shadow-red-900/30 hover:scale-105"
               >
                 <Play className="w-5 h-5 fill-current" />
                 <span>Watch Movie</span>
               </Link>
 
               <button
+                onClick={() => setIsTrailerOpen(true)}
+                className="flex items-center gap-2 px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold transition backdrop-blur-md hover:scale-105"
+              >
+                <Film className="w-5 h-5 text-brand-red" />
+                <span>Watch Trailer</span>
+              </button>
+
+              <button
                 onClick={handleToggle}
                 className={`flex items-center gap-2 px-6 py-3.5 rounded-xl font-medium border backdrop-blur-md transition hover:scale-105 ${
                   isBookmarked
                     ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300'
-                    : 'bg-white/10 border-white/20 text-white hover:bg-white/20'
+                    : 'bg-zinc-900/80 border-white/15 text-zinc-200 hover:text-white hover:bg-zinc-800'
                 }`}
               >
                 {isBookmarked ? <Check className="w-5 h-5 text-emerald-400" /> : <Plus className="w-5 h-5" />}
@@ -193,6 +231,14 @@ export default function MovieDetailsClient({ id }: { id?: string }) {
           </div>
         )}
       </div>
+
+      <TrailerModal
+        isOpen={isTrailerOpen}
+        onClose={() => setIsTrailerOpen(false)}
+        mediaType="movie"
+        tmdbId={movie.id}
+        title={movie.title}
+      />
     </div>
   );
 }

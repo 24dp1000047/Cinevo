@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { AlertCircle, ArrowLeft, Loader2 } from 'lucide-react';
-import { usePlayback, useMovieDetails, useTVDetails, useTVSeason } from '../../../../hooks/useMedia';
+import { usePlayback, useMovieDetails, useTVDetails, useTVSeason, useHistory } from '../../../../hooks/useMedia';
 import { VideoPlayer } from '../../../../components/player/VideoPlayer';
 import { EpisodeSelector } from '../../../../components/player/EpisodeSelector';
 import { ServerSelector } from '../../../../components/player/ServerSelector';
@@ -18,14 +18,32 @@ export default function WatchClient({
   id?: string;
 }) {
   const clientParams = useParams();
-  const rawType = type || (clientParams?.type as string) || 'movie';
-  const mediaType = rawType === 'tv' ? 'tv' : 'movie';
-
-  const rawId = propId || (clientParams?.id as string) || '1';
-  const id = parseInt(rawId, 10);
-
   const searchParams = useSearchParams();
   const router = useRouter();
+
+  // Route parameters with Cloudflare Pages SPA rewrite fallback
+  const [resolvedType, setResolvedType] = useState<'movie' | 'tv'>(() => {
+    const rawType = type || (clientParams?.type as string) || 'movie';
+    return rawType === 'tv' ? 'tv' : 'movie';
+  });
+
+  const [resolvedId, setResolvedId] = useState<number>(() => {
+    const rawId = propId || (clientParams?.id as string) || '1';
+    return parseInt(rawId, 10);
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const match = window.location.pathname.match(/\/watch\/(movie|tv)\/(\d+)/);
+      if (match) {
+        setResolvedType(match[1] as 'movie' | 'tv');
+        setResolvedId(parseInt(match[2], 10));
+      }
+    }
+  }, []);
+
+  const mediaType = resolvedType;
+  const id = resolvedId;
 
   const seasonNumber = parseInt(searchParams.get('season') || '1', 10);
   const episodeNumber = parseInt(searchParams.get('episode') || '1', 10);
@@ -42,9 +60,36 @@ export default function WatchClient({
     isError: isStreamError,
   } = usePlayback(mediaType, id, seasonNumber, episodeNumber);
 
+  // Watch history tracking
+  const { saveProgress } = useHistory();
+
   // Active Server State
   const [activeServerId, setActiveServerId] = useState<string>('vidlink');
   const [isIframeLoading, setIsIframeLoading] = useState<boolean>(true);
+
+  // Auto-record progress to localStorage history so "Continue Watching" works on any server
+  useEffect(() => {
+    if (!id || id <= 0) return;
+    const mediaTitle =
+      mediaType === 'movie'
+        ? movie?.title
+        : tv?.name;
+
+    const poster = mediaType === 'movie' ? movie?.poster_path : tv?.poster_path;
+
+    if (mediaTitle) {
+      saveProgress({
+        tmdbId: id,
+        mediaType,
+        title: mediaTitle,
+        posterPath: poster || null,
+        season: mediaType === 'tv' ? seasonNumber : undefined,
+        episode: mediaType === 'tv' ? episodeNumber : undefined,
+        progress: 1, // Marks as initiated
+        duration: 100,
+      });
+    }
+  }, [id, mediaType, movie, tv, seasonNumber, episodeNumber, saveProgress]);
 
   useEffect(() => {
     setIsIframeLoading(true);

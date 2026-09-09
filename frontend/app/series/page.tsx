@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import Link from 'next/link';
 import { api } from '../../lib/api';
 import { TVShow } from '../../types';
 import { MovieCard } from '../../components/movie-card/MovieCard';
 import { MovieCardSkeleton } from '../../components/ui/Skeleton';
-import { Tv, Loader2 } from 'lucide-react';
+import { Tv, Loader2, Compass } from 'lucide-react';
 
 export default function SeriesPage() {
   const [tab, setTab] = useState<'popular' | 'topRated'>('popular');
@@ -97,24 +98,34 @@ export default function SeriesPage() {
           </p>
         </div>
 
-        {/* Filter Tabs */}
-        <div className="flex items-center gap-2 bg-zinc-900/80 p-1.5 rounded-xl border border-white/10 self-start">
-          <button
-            onClick={() => setTab('popular')}
-            className={`px-4 py-2 rounded-lg text-xs font-semibold transition ${
-              tab === 'popular' ? 'bg-indigo-600 text-white shadow' : 'text-zinc-400 hover:text-white'
-            }`}
+        {/* Controls: Advanced Discover & Filter Tabs */}
+        <div className="flex flex-wrap items-center gap-3 self-start md:self-auto">
+          <Link
+            href="/discover?type=tv"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-600/20 to-purple-600/10 border border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/20 text-xs font-bold transition shadow-sm"
           >
-            Popular Series
-          </button>
-          <button
-            onClick={() => setTab('topRated')}
-            className={`px-4 py-2 rounded-lg text-xs font-semibold transition ${
-              tab === 'topRated' ? 'bg-indigo-600 text-white shadow' : 'text-zinc-400 hover:text-white'
-            }`}
-          >
-            Top Rated
-          </button>
+            <Compass className="w-4 h-4" />
+            <span>Advanced Discover</span>
+          </Link>
+
+          <div className="flex items-center gap-2 bg-zinc-900/80 p-1.5 rounded-xl border border-white/10">
+            <button
+              onClick={() => setTab('popular')}
+              className={`px-4 py-2 rounded-lg text-xs font-semibold transition ${
+                tab === 'popular' ? 'bg-indigo-600 text-white shadow' : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              Popular Series
+            </button>
+            <button
+              onClick={() => setTab('topRated')}
+              className={`px-4 py-2 rounded-lg text-xs font-semibold transition ${
+                tab === 'topRated' ? 'bg-indigo-600 text-white shadow' : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              Top Rated
+            </button>
+          </div>
         </div>
       </div>
 

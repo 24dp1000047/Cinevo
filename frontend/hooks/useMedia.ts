@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { guestStorage } from '../lib/guestStorage';
+import { DiscoverFilters } from '../types';
 
 export function useTrendingMovies(page = 1) {
   return useQuery({
@@ -101,17 +102,48 @@ export function useSearch(query: string, page = 1) {
   });
 }
 
-export function usePlayback(type: 'movie' | 'tv', id: number, season = 1, episode = 1) {
+export function useDiscoverMedia(filters: DiscoverFilters) {
   return useQuery({
-    queryKey: ['playback', type, id, season, episode],
+    queryKey: [
+      'discover',
+      filters.mediaType,
+      filters.genres?.slice().sort().join(','),
+      filters.sortBy,
+      filters.year,
+      filters.yearRange,
+      filters.minRating,
+      filters.page,
+    ],
+    queryFn: () => api.discoverMedia(filters),
+  });
+}
+
+export function usePlayback(
+  type: 'movie' | 'tv',
+  id: number,
+  season = 1,
+  episode = 1,
+  options?: { startSec?: number; autoPlay?: boolean; color?: string }
+) {
+  return useQuery({
+    queryKey: ['playback', type, id, season, episode, options?.startSec, options?.autoPlay],
     queryFn: () => {
       if (type === 'movie') {
-        return api.getMovieStream(id);
+        return api.getMovieStream(id, options);
       } else {
-        return api.getEpisodeStream(id, season, episode);
+        return api.getEpisodeStream(id, season, episode, options);
       }
     },
     enabled: Boolean(id),
+  });
+}
+
+export function useMediaVideos(type: 'movie' | 'tv', id: number) {
+  return useQuery({
+    queryKey: ['videos', type, id],
+    queryFn: () => (type === 'movie' ? api.getMovieVideos(id) : api.getTVVideos(id)),
+    enabled: Boolean(id && id > 0),
+    staleTime: 1000 * 60 * 30,
   });
 }
 

@@ -5,9 +5,9 @@ export function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivEl
   return <div className={cn('skeleton-shimmer rounded-md bg-zinc-800/60', className)} {...props} />;
 }
 
-export function MovieCardSkeleton() {
+export function MovieCardSkeleton({ className }: { className?: string } = {}) {
   return (
-    <div className="flex-shrink-0 w-44 md:w-52 space-y-2">
+    <div className={cn('flex-shrink-0 space-y-2', className || 'w-44 md:w-52')}>
       <Skeleton className="w-full aspect-[2/3] rounded-xl" />
       <Skeleton className="h-4 w-3/4 rounded" />
       <Skeleton className="h-3 w-1/2 rounded" />

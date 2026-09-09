@@ -15,23 +15,19 @@ export default function ProfilePage() {
 
   const handleClearHistory = () => {
     if (confirm('Are you sure you want to clear your entire watch history?')) {
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('cinevo_guest_history');
-        queryClient.invalidateQueries({ queryKey: ['history'] });
-        setClearedMessage('Watch history cleared.');
-        setTimeout(() => setClearedMessage(null), 3000);
-      }
+      guestStorage.clearHistory();
+      queryClient.invalidateQueries({ queryKey: ['history'] });
+      setClearedMessage('Watch history cleared.');
+      setTimeout(() => setClearedMessage(null), 3000);
     }
   };
 
   const handleClearWatchlist = () => {
     if (confirm('Are you sure you want to clear all bookmarked titles in My List?')) {
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('cinevo_guest_watchlist');
-        queryClient.invalidateQueries({ queryKey: ['watchlist'] });
-        setClearedMessage('My List cleared.');
-        setTimeout(() => setClearedMessage(null), 3000);
-      }
+      guestStorage.clearWatchlist();
+      queryClient.invalidateQueries({ queryKey: ['watchlist'] });
+      setClearedMessage('My List cleared.');
+      setTimeout(() => setClearedMessage(null), 3000);
     }
   };
 
