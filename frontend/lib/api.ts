@@ -160,8 +160,8 @@ export const getEmbedUrl = (
   switch (selectedServer) {
     case 'vidlink': // VidLink Pro
       return isTV
-        ? `https://vidlink.pro/tv/${tmdbId}/${season}/${episode}${timeParamVidLink}`
-        : `https://vidlink.pro/movie/${tmdbId}${timeParamVidLink}`;
+        ? `https://vidlink.pro/tv/${tmdbId}/${season}/${episode}?primaryColor=${color}&autoplay=true&nextbutton=true${startSec > 0 ? `&start=${startSec}` : ''}`
+        : `https://vidlink.pro/movie/${tmdbId}?primaryColor=${color}&autoplay=true${startSec > 0 ? `&start=${startSec}` : ''}`;
 
     case 'screenscape': // ScreenScape (Official API: https://screenscape.me/embed?tmdb=...&type=movie or &type=tv&s=...&e=...)
       return isTV
@@ -216,8 +216,26 @@ export const generateServers = (
 
   return [
     {
+      id: 'vidlink',
+      name: '#1 VidLink Pro',
+      quality: '1080p Ultra',
+      features: 'Ultra-fast CDN, instant seeking, multi-source player',
+      type: 'embed',
+      icon: 'sparkles',
+      url: getEmbedUrl('vidlink', params),
+    },
+    {
+      id: 'screenscape',
+      name: '#2 ScreenScape Ultra',
+      quality: '1080p Ultra HD',
+      features: 'High-speed ScreenScape bufferless stream (Multi-server & Subtitles)',
+      type: 'embed',
+      icon: 'flame',
+      url: getEmbedUrl('screenscape', params),
+    },
+    {
       id: 'vidking',
-      name: '#1 VidKing Ultra',
+      name: '#3 VidKing Ultra',
       quality: '1080p Ultra',
       features: 'Fastest 1080p bufferless player, zero popups, instant seek',
       type: 'embed',
@@ -226,7 +244,7 @@ export const generateServers = (
     },
     {
       id: 'autoembed',
-      name: '#2 AutoEmbed.co',
+      name: '#4 AutoEmbed.co',
       quality: '1080p HD',
       features: 'Fast TMDB-indexed multi-server fallback',
       type: 'embed',
@@ -235,7 +253,7 @@ export const generateServers = (
     },
     {
       id: 'vidsrcsu',
-      name: '#3 VidSrc.su',
+      name: '#5 VidSrc.su',
       quality: '1080p Ultra',
       features: 'Multi-audio tracks & multi-language subtitles',
       type: 'embed',
@@ -244,7 +262,7 @@ export const generateServers = (
     },
     {
       id: 'vidsrcme',
-      name: '#4 VidSrc.me',
+      name: '#6 VidSrc.me',
       quality: '1080p HD',
       features: 'Deep international catalog archive',
       type: 'embed',
@@ -252,31 +270,13 @@ export const generateServers = (
       url: getEmbedUrl('vidsrcme', params),
     },
     {
-      id: 'vidlink',
-      name: '#5 VidLink Pro',
-      quality: '1080p Ultra',
-      features: 'Ultra-fast CDN, direct timeline seeking API',
-      type: 'embed',
-      icon: 'sparkles',
-      url: getEmbedUrl('vidlink', params),
-    },
-    {
       id: 'smashy',
-      name: '#6 SmashyStream',
+      name: '#7 SmashyStream',
       quality: '1080p HD',
       features: 'High-uptime backup mirrors',
       type: 'embed',
       icon: 'layers',
       url: getEmbedUrl('smashy', params),
-    },
-    {
-      id: 'screenscape',
-      name: '#7 ScreenScape',
-      quality: '1080p Ultra HD',
-      features: 'Official ScreenScape bufferless streaming',
-      type: 'embed',
-      icon: 'sparkles',
-      url: getEmbedUrl('screenscape', params),
     },
     {
       id: 'embedsu',

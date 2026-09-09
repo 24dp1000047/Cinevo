@@ -78,8 +78,8 @@ export default function WatchClient({
   // Watch history tracking
   const { saveProgress } = useHistory();
 
-  // Active Server State (VidKing Ultra default for rock-solid 1080p stream playback)
-  const [activeServerId, setActiveServerId] = useState<string>('vidking');
+  // Active Server State (VidLink Pro default #1)
+  const [activeServerId, setActiveServerId] = useState<string>('vidlink');
   const [isIframeLoading, setIsIframeLoading] = useState<boolean>(true);
 
   // Auto-record progress to localStorage history so "Continue Watching" works on any server
