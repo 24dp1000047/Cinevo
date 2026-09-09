@@ -37,28 +37,6 @@ if (source) {
       fs.copyFileSync(redirectsSrc, path.join(target, '_redirects'));
     }
 
-    // Generate dedicated SPA fallback shell files outside dynamic path namespaces
-    // to completely eliminate Cloudflare Pages self-referencing 308 redirect loops
-    const fallbackDir = path.join(target, 'fallback');
-    fs.mkdirSync(fallbackDir, { recursive: true });
-
-    const fallbackCopies = [
-      { src: path.join(target, 'movie', '550.html'), dest: path.join(fallbackDir, 'movie.html') },
-      { src: path.join(target, 'movie', '550.txt'), dest: path.join(fallbackDir, 'movie.txt') },
-      { src: path.join(target, 'tv', '1399.html'), dest: path.join(fallbackDir, 'tv.html') },
-      { src: path.join(target, 'tv', '1399.txt'), dest: path.join(fallbackDir, 'tv.txt') },
-      { src: path.join(target, 'watch', 'movie', '550.html'), dest: path.join(fallbackDir, 'watch-movie.html') },
-      { src: path.join(target, 'watch', 'movie', '550.txt'), dest: path.join(fallbackDir, 'watch-movie.txt') },
-      { src: path.join(target, 'watch', 'tv', '1399.html'), dest: path.join(fallbackDir, 'watch-tv.html') },
-      { src: path.join(target, 'watch', 'tv', '1399.txt'), dest: path.join(fallbackDir, 'watch-tv.txt') },
-    ];
-
-    for (const item of fallbackCopies) {
-      if (fs.existsSync(item.src)) {
-        fs.copyFileSync(item.src, item.dest);
-      }
-    }
-
     // Eradicate any rogue worker files or route interceptors
     const rogueFiles = [
       path.join(target, '_worker.js'),

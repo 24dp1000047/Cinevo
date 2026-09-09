@@ -1,14 +1,9 @@
-# Preserve Next.js static RSC prefetch files
-/watch/movie/*.txt  /watch/movie/:splat.txt  200
-/watch/tv/*.txt     /watch/tv/:splat.txt     200
-/movie/*.txt        /movie/:splat.txt        200
-/tv/*.txt           /tv/:splat.txt           200
-
-# Client-side dynamic routing fallbacks to non-conflicting dedicated shell paths
-/watch/movie/*      /fallback/watch-movie    200
-/watch/tv/*         /fallback/watch-tv       200
-/watch/*            /fallback/watch-movie    200
+# Client-side dynamic routing fallbacks to dedicated native fallback shells
+/watch/movie/*      /fallback/watch          200
+/watch/tv/*         /fallback/watch          200
+/watch/*            /fallback/watch          200
 /movie/*            /fallback/movie          200
 /tv/*               /fallback/tv             200
+
 
 
