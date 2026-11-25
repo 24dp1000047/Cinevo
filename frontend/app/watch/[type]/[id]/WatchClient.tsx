@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, useRouter, useParams } from 'next/navigation';
+import { useSearchParams, useRouter, useParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { AlertCircle, ArrowLeft, Loader2 } from 'lucide-react';
 import { usePlayback, useMovieDetails, useTVDetails, useTVSeason, useHistory } from '../../../../hooks/useMedia';
@@ -19,6 +19,7 @@ export default function WatchClient({
 }) {
   const clientParams = useParams();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const router = useRouter();
 
   // Route parameters with Cloudflare Pages SPA rewrite fallback (synchronous check)
@@ -55,7 +56,7 @@ export default function WatchClient({
         }
       }
     }
-  }, []);
+  }, [pathname, type, propId]);
 
   const mediaType = resolvedType;
   const id = resolvedId;
@@ -78,8 +79,8 @@ export default function WatchClient({
   // Watch history tracking
   const { saveProgress } = useHistory();
 
-  // Active Server State (VidLink Pro default #1)
-  const [activeServerId, setActiveServerId] = useState<string>('vidlink');
+  // Active Server State (Cinezo No Ads default #1)
+  const [activeServerId, setActiveServerId] = useState<string>('cinezo');
   const [isIframeLoading, setIsIframeLoading] = useState<boolean>(true);
 
   // Auto-record progress to localStorage history so "Continue Watching" works on any server
@@ -154,7 +155,7 @@ export default function WatchClient({
       <div className="w-full max-w-7xl mx-auto px-0 md:px-6">
         {isStreamLoading ? (
           <div className="w-full aspect-video max-h-[85vh] bg-zinc-950 flex flex-col items-center justify-center text-zinc-400 gap-3 border border-white/5 md:rounded-2xl overflow-hidden">
-            <div className="w-12 h-12 border-3 border-brand-red border-t-transparent rounded-full animate-spin" />
+            <div className="w-12 h-12 border-4 border-brand-red border-t-transparent rounded-full animate-spin" />
             <p className="text-sm font-medium">Resolving streaming servers...</p>
           </div>
         ) : isStreamError || !playback ? (
@@ -178,8 +179,8 @@ export default function WatchClient({
             {activeServer && activeServer.type === 'embed' ? (
               <div className="relative w-full aspect-video max-h-[85vh] bg-black">
                 {/* Header Back & Info Bar */}
-                <div className="absolute top-0 left-0 right-0 p-3.5 bg-gradient-to-b from-black/80 to-transparent flex items-center justify-between z-20 pointer-events-auto">
-                  <div className="flex items-center gap-3">
+                <div className="absolute top-0 left-0 right-0 p-3.5 bg-gradient-to-b from-black/80 to-transparent flex items-center justify-between z-20 pointer-events-none">
+                  <div className="flex items-center gap-3 pointer-events-auto">
                     <Link
                       href={backUrl}
                       className="p-1.5 rounded-full bg-black/60 hover:bg-white/20 text-white backdrop-blur-md transition"

@@ -138,7 +138,7 @@ const tmdbClient = axios.create({
   },
 });
 
-const VIDKING_BASE = 'https://vidking.net/embed';
+const VIDKING_BASE = 'https://www.vidking.net/embed';
 
 export const getEmbedUrl = (
   selectedServer: string,
@@ -153,58 +153,203 @@ export const getEmbedUrl = (
 ): string => {
   const { tmdbId, season = 1, episode = 1, startSec = 0, autoPlay = true, color = 'e50914' } = params;
   const isTV = Boolean(params.season && params.episode);
-  const apFlag = autoPlay ? '1' : 'true';
-  const timeParamVidLink = startSec > 0 ? `?start=${startSec}` : '';
   const timeParamVidKing = startSec > 0 ? `&t=${startSec}` : '';
 
   switch (selectedServer) {
-    case 'vidlink': // VidLink Pro
+    case 'cinezo':
+      return isTV
+        ? `https://cinezo.net/embed/tv/${tmdbId}/${season}/${episode}`
+        : `https://cinezo.net/embed/movie/${tmdbId}`;
+
+    case 'cinesrc':
+      return isTV
+        ? `https://cinesrc.st/embed/tv/${tmdbId}/${season}/${episode}`
+        : `https://cinesrc.st/embed/movie/${tmdbId}`;
+
+    case 'peestream':
+      return isTV
+        ? `https://pstream.mov/embed/tmdb-tv-${tmdbId}/${season}/${episode}`
+        : `https://pstream.mov/embed/tmdb-movie-${tmdbId}`;
+
+    case 'flaxmovies':
+      return isTV
+        ? `https://flaxmovies.xyz/embed/tv/${tmdbId}/${season}/${episode}`
+        : `https://flaxmovies.xyz/embed/movie/${tmdbId}`;
+
+    case 'moviesapi':
+      return isTV
+        ? `https://moviesapi.club/tv/${tmdbId}-${season}-${episode}`
+        : `https://moviesapi.club/movie/${tmdbId}`;
+
+    case 'vidlink':
       return isTV
         ? `https://vidlink.pro/tv/${tmdbId}/${season}/${episode}?primaryColor=${color}&autoplay=true&nextbutton=true${startSec > 0 ? `&start=${startSec}` : ''}`
         : `https://vidlink.pro/movie/${tmdbId}?primaryColor=${color}&autoplay=true${startSec > 0 ? `&start=${startSec}` : ''}`;
 
-    case 'screenscape': // ScreenScape (Official API: https://screenscape.me/embed?tmdb=...&type=movie or &type=tv&s=...&e=...)
+    case 'vidsrc-embed':
       return isTV
-        ? `https://screenscape.me/embed?tmdb=${tmdbId}&type=tv&s=${season}&e=${episode}`
-        : `https://screenscape.me/embed?tmdb=${tmdbId}&type=movie`;
+        ? `https://vidsrc.xyz/embed/tv/${tmdbId}/${season}/${episode}`
+        : `https://vidsrc.xyz/embed/movie/${tmdbId}`;
 
-    case 'vidsrcsu': // VidSrc.su
+    case 'videasy':
       return isTV
-        ? `https://vidsrc.su/tv/${tmdbId}/${season}/${episode}?autoplay=true${startSec > 0 ? `&t=${startSec}` : ''}`
-        : `https://vidsrc.su/movie/${tmdbId}?autoplay=true${startSec > 0 ? `&t=${startSec}` : ''}`;
+        ? `https://player.videasy.net/tv/${tmdbId}/${season}/${episode}?color=${color}`
+        : `https://player.videasy.net/movie/${tmdbId}?color=${color}`;
 
-    case 'autoembed': // AutoEmbed.co
+    case '111movies':
       return isTV
-        ? `https://autoembed.co/tv/tmdb/${tmdbId}-${season}-${episode}?autoplay=${apFlag}`
-        : `https://autoembed.co/movie/tmdb/${tmdbId}?autoplay=${apFlag}`;
+        ? `https://111movies.com/tv/${tmdbId}/${season}/${episode}`
+        : `https://111movies.com/movie/${tmdbId}`;
 
-    case 'vidsrcme': // VidSrc.me
+    case 'vidzee':
       return isTV
-        ? `https://vidsrcme.ru/embed/tv/${tmdbId}/${season}/${episode}?autoplay=1&autonext=1&ds_lang=en`
-        : `https://vidsrcme.ru/embed/movie/${tmdbId}?autoplay=1&ds_lang=en`;
+        ? `https://player.vidzee.wtf/embed/tv/${tmdbId}/${season}/${episode}`
+        : `https://player.vidzee.wtf/embed/movie/${tmdbId}`;
 
-    case 'smashy': // SmashyStream
+    case 'vidsrc':
       return isTV
-        ? `https://embed.smashystream.com/playere.php?tmdb=${tmdbId}&season=${season}&episode=${episode}&autoplay=${apFlag}${startSec > 0 ? `&start=${startSec}` : ''}`
-        : `https://embed.smashystream.com/playere.php?tmdb=${tmdbId}&autoplay=${apFlag}${startSec > 0 ? `&start=${startSec}` : ''}`;
+        ? `https://vidsrc.to/embed/tv/${tmdbId}/${season}/${episode}`
+        : `https://vidsrc.to/embed/movie/${tmdbId}`;
 
-    case 'embedsu': // Embed.su
+    case '2embed':
       return isTV
-        ? `https://embed.su/embed/tv/${tmdbId}/${season}/${episode}?autoplay=${apFlag}`
-        : `https://embed.su/embed/movie/${tmdbId}?autoplay=${apFlag}`;
+        ? `https://www.2embed.cc/embedtv/${tmdbId}&s=${season}&e=${episode}`
+        : `https://www.2embed.cc/embed/${tmdbId}`;
 
-    case 'multiembed': // MultiEmbed
+    case 'mapple':
       return isTV
-        ? `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&s=${season}&e=${episode}&autoplay=${apFlag}`
-        : `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&autoplay=${apFlag}`;
+        ? `https://mapple.uk/watch/tv/${tmdbId}-${season}-${episode}`
+        : `https://mapple.uk/watch/movie/${tmdbId}`;
+
+    case 'primesrc':
+      return isTV
+        ? `https://primesrc.me/embed/tv?tmdb=${tmdbId}&season=${season}&episode=${episode}`
+        : `https://primesrc.me/embed/movie?tmdb=${tmdbId}`;
+
+    case 'multiembed':
+      return isTV
+        ? `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&s=${season}&e=${episode}`
+        : `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1`;
+
+    case 'autoembed':
+      return isTV
+        ? `https://player.autoembed.cc/embed/tv/${tmdbId}/${season}/${episode}`
+        : `https://player.autoembed.cc/embed/movie/${tmdbId}`;
+
+    case 'vixsrc':
+      return isTV
+        ? `https://vixsrc.to/tv/${tmdbId}/${season}/${episode}`
+        : `https://vixsrc.to/movie/${tmdbId}`;
+
+    case 'vidlove':
+      return isTV
+        ? `https://vidlove.to/embed/tv/${tmdbId}/${season}/${episode}`
+        : `https://vidlove.to/embed/movie/${tmdbId}`;
+
+    case 'vidfast':
+      return isTV
+        ? `https://vidfast.pro/tv/${tmdbId}/${season}/${episode}?autoPlay=true`
+        : `https://vidfast.pro/movie/${tmdbId}?autoPlay=true`;
+
+    case 'filmu':
+      return isTV
+        ? `https://filmu.in/embed/tv/${tmdbId}/${season}/${episode}`
+        : `https://filmu.in/embed/movie/${tmdbId}`;
+
+    case 'vidcore':
+      return isTV
+        ? `https://vidcore.org/embed/tv/${tmdbId}/${season}/${episode}`
+        : `https://vidcore.org/embed/movie/${tmdbId}`;
+
+    case 'vaplayer':
+      return isTV
+        ? `https://vaplayer.ru/embed/tv/${tmdbId}/${season}/${episode}`
+        : `https://vaplayer.ru/embed/movie/${tmdbId}`;
+
+    case 'vares':
+      return isTV
+        ? `https://vares.me/embed/tv/${tmdbId}/${season}/${episode}`
+        : `https://vares.me/embed/movie/${tmdbId}`;
 
     case 'vidking':
-    default: // VidKing
       return isTV
         ? `${VIDKING_BASE}/tv/${tmdbId}/${season}/${episode}?color=${color}&autoPlay=${autoPlay}&nextEpisode=true&episodeSelector=true${timeParamVidKing}`
         : `${VIDKING_BASE}/movie/${tmdbId}?color=${color}&autoPlay=${autoPlay}${timeParamVidKing}`;
+
+    case 'vidbolt':
+      return isTV
+        ? `https://vidbolt.net/embed/tv/${tmdbId}/${season}/${episode}`
+        : `https://vidbolt.net/embed/movie/${tmdbId}`;
+
+    case 'vidnest':
+      return isTV
+        ? `https://vidnest.fun/tv/${tmdbId}/${season}/${episode}`
+        : `https://vidnest.fun/movie/${tmdbId}`;
+
+    case 'vidsrcsu':
+      return isTV
+        ? `https://vidsrc.su/embed/tv/${tmdbId}/${season}/${episode}`
+        : `https://vidsrc.su/embed/movie/${tmdbId}`;
+
+    case 'vidgod':
+      return isTV
+        ? `https://vidgod.com/embed/tv/${tmdbId}/${season}/${episode}`
+        : `https://vidgod.com/embed/movie/${tmdbId}`;
+
+    case 'vidsrcme':
+      return isTV
+        ? `https://vidsrc.me/embed/tv?tmdb=${tmdbId}&season=${season}&episode=${episode}`
+        : `https://vidsrc.me/embed/movie?tmdb=${tmdbId}`;
+
+    case '1embed':
+      return isTV
+        ? `https://1embed.net/embed/tv/${tmdbId}/${season}/${episode}`
+        : `https://1embed.net/embed/movie/${tmdbId}`;
+
+    default:
+      return isTV
+        ? `https://cinezo.net/embed/tv/${tmdbId}/${season}/${episode}`
+        : `https://cinezo.net/embed/movie/${tmdbId}`;
   }
 };
+
+const SERVER_DEFINITIONS: Array<{
+  id: string;
+  name: string;
+  features: string;
+  icon: StreamServer['icon'];
+}> = [
+  { id: 'cinezo', name: 'Cinezo (No Ads)', features: 'Ad-free high-speed stream', icon: 'sparkles' },
+  { id: 'cinesrc', name: 'CineSrc (No Ads)', features: 'Ad-free multi-server stream', icon: 'flame' },
+  { id: 'peestream', name: 'PeeStream (No Ads)', features: 'Clean ad-free player', icon: 'zap' },
+  { id: 'flaxmovies', name: 'FlaxMovies (No Ads)', features: 'Ad-free HD playback with subtitles', icon: 'play' },
+  { id: 'moviesapi', name: 'MoviesAPI (No Ads)', features: 'Ad-free multi-quality HLS', icon: 'server' },
+  { id: 'vidlink', name: 'VidLink', features: 'Ultra-fast CDN & instant seeking', icon: 'sparkles' },
+  { id: 'vidsrc-embed', name: 'VidSrc Embed', features: 'Reliable primary embed mirror', icon: 'globe' },
+  { id: 'videasy', name: 'VidEasy', features: 'Fast adaptive player', icon: 'zap' },
+  { id: '111movies', name: '111Movies', features: 'Multi-source fallback mirror', icon: 'layers' },
+  { id: 'vidzee', name: 'VidZee', features: 'High-bitrate HD stream', icon: 'flame' },
+  { id: 'vidsrc', name: 'VidSrc', features: 'Classic multi-mirror source', icon: 'globe' },
+  { id: '2embed', name: '2Embed', features: 'Wide catalog backup server', icon: 'layers' },
+  { id: 'mapple', name: 'Mapple', features: 'Clean minimalist player', icon: 'play' },
+  { id: 'primesrc', name: 'PrimeSrc', features: 'Multi-provider aggregator', icon: 'sparkles' },
+  { id: 'multiembed', name: 'MultiEmbed', features: 'Deep archive & classic releases', icon: 'monitor' },
+  { id: 'autoembed', name: 'AutoEmbed', features: 'Automated TMDB server routing', icon: 'radio' },
+  { id: 'vixsrc', name: 'VixSrc', features: 'Fast direct HLS embed', icon: 'zap' },
+  { id: 'vidlove', name: 'VidLove', features: 'HD backup streaming server', icon: 'play' },
+  { id: 'vidfast', name: 'VidFast', features: 'Low-latency fast start player', icon: 'flame' },
+  { id: 'filmu', name: 'Filmu', features: 'Alternative HD mirror', icon: 'server' },
+  { id: 'vidcore', name: 'VidCore', features: 'Modern HTML5 stream engine', icon: 'sparkles' },
+  { id: 'vaplayer', name: 'VAPlayer', features: 'International audio & subs', icon: 'globe' },
+  { id: 'vares', name: 'Vares', features: 'Lightweight backup player', icon: 'radio' },
+  { id: 'vidking', name: 'VidKing', features: '1080p bufferless player', icon: 'zap' },
+  { id: 'vidbolt', name: 'VidBolt', features: 'High-speed CDN mirror', icon: 'flame' },
+  { id: 'vidnest', name: 'VidNest', features: 'Multi-language subtitle support', icon: 'layers' },
+  { id: 'vidsrcsu', name: 'VidSrc.su', features: 'Multi-audio & subtitle tracks', icon: 'globe' },
+  { id: 'vidgod', name: 'VidGod', features: 'Backup HD embed source', icon: 'monitor' },
+  { id: 'vidsrcme', name: 'VidSrc.me', features: 'Deep international archive', icon: 'play' },
+  { id: '1embed', name: '1Embed', features: 'Universal fallback embed', icon: 'server' },
+];
 
 export const generateServers = (
   tmdbId: number,
@@ -214,98 +359,14 @@ export const generateServers = (
 ): StreamServer[] => {
   const params = { tmdbId, season, episode, ...options };
 
-  return [
-    {
-      id: 'vidlink',
-      name: '#1 VidLink Pro',
-      quality: '1080p Ultra',
-      features: 'Ultra-fast CDN, instant seeking, multi-source player',
-      type: 'embed',
-      icon: 'sparkles',
-      url: getEmbedUrl('vidlink', params),
-    },
-    {
-      id: 'screenscape',
-      name: '#2 ScreenScape Ultra',
-      quality: '1080p Ultra HD',
-      features: 'High-speed ScreenScape bufferless stream (Multi-server & Subtitles)',
-      type: 'embed',
-      icon: 'flame',
-      url: getEmbedUrl('screenscape', params),
-    },
-    {
-      id: 'vidking',
-      name: '#3 VidKing Ultra',
-      quality: '1080p Ultra',
-      features: 'Fastest 1080p bufferless player, zero popups, instant seek',
-      type: 'embed',
-      icon: 'zap',
-      url: getEmbedUrl('vidking', params),
-    },
-    {
-      id: 'autoembed',
-      name: '#4 AutoEmbed.co',
-      quality: '1080p HD',
-      features: 'Fast TMDB-indexed multi-server fallback',
-      type: 'embed',
-      icon: 'radio',
-      url: getEmbedUrl('autoembed', params),
-    },
-    {
-      id: 'vidsrcsu',
-      name: '#5 VidSrc.su',
-      quality: '1080p Ultra',
-      features: 'Multi-audio tracks & multi-language subtitles',
-      type: 'embed',
-      icon: 'globe',
-      url: getEmbedUrl('vidsrcsu', params),
-    },
-    {
-      id: 'vidsrcme',
-      name: '#6 VidSrc.me',
-      quality: '1080p HD',
-      features: 'Deep international catalog archive',
-      type: 'embed',
-      icon: 'play',
-      url: getEmbedUrl('vidsrcme', params),
-    },
-    {
-      id: 'smashy',
-      name: '#7 SmashyStream',
-      quality: '1080p HD',
-      features: 'High-uptime backup mirrors',
-      type: 'embed',
-      icon: 'layers',
-      url: getEmbedUrl('smashy', params),
-    },
-    {
-      id: 'embedsu',
-      name: '#8 Embed.su',
-      quality: '1080p / 4K',
-      features: '4K streams with automated subtitle rendering',
-      type: 'embed',
-      icon: 'sparkles',
-      url: getEmbedUrl('embedsu', params),
-    },
-    {
-      id: 'multiembed',
-      name: '#9 MultiEmbed',
-      quality: '1080p HD',
-      features: 'Deep catalog archive & classic releases',
-      type: 'embed',
-      icon: 'monitor',
-      url: getEmbedUrl('multiembed', params),
-    },
-    {
-      id: 'native-hls',
-      name: '#10 Cinevo Direct',
-      quality: 'Direct HLS',
-      features: 'Adaptive bitrate cinema player (M3U8)',
-      type: 'hls',
-      icon: 'server',
-      url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-    },
-  ];
+  return SERVER_DEFINITIONS.map((srv) => ({
+    id: srv.id,
+    name: srv.name,
+    features: srv.features,
+    type: 'embed' as const,
+    icon: srv.icon,
+    url: getEmbedUrl(srv.id, params),
+  }));
 };
 
 const defaultSources: StreamSource[] = [
@@ -323,65 +384,224 @@ const defaultSources: StreamSource[] = [
   },
 ];
 
+const FALLBACK_MOVIES: Movie[] = [
+  {
+    id: 550,
+    title: 'Fight Club',
+    overview: 'A ticking-time-bomb insomniac and a slippery soap salesman channel primal male aggression into a shocking new form of therapy.',
+    poster_path: '/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg',
+    backdrop_path: '/hZkgoQYus5vegHoetLkCJzb17zJ.jpg',
+    release_date: '1999-10-15',
+    vote_average: 8.4,
+    vote_count: 29000,
+    popularity: 95.0,
+    genre_ids: [18],
+    runtime: 139,
+    media_type: 'movie',
+  },
+  {
+    id: 157336,
+    title: 'Interstellar',
+    overview: 'The adventures of a group of explorers who make use of a newly discovered wormhole to surpass the limitations on human space travel.',
+    poster_path: '/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg',
+    backdrop_path: '/xJHokMbljvjADYdit5fK5VQsXEG.jpg',
+    release_date: '2014-11-05',
+    vote_average: 8.4,
+    vote_count: 35000,
+    popularity: 120.0,
+    genre_ids: [12, 18, 878],
+    runtime: 169,
+    media_type: 'movie',
+  },
+  {
+    id: 27205,
+    title: 'Inception',
+    overview: 'Cobb, a skilled thief who commits corporate espionage by infiltrating the subconscious of his targets is offered a chance to regain his old life.',
+    poster_path: '/ljsZTbVsrQSqZgWeep2B1QiDKuh.jpg',
+    backdrop_path: '/8ZTVqvKDQ8emSGUEMjsS4yHAwrp.jpg',
+    release_date: '2010-07-15',
+    vote_average: 8.4,
+    vote_count: 36000,
+    popularity: 110.0,
+    genre_ids: [28, 878, 12],
+    runtime: 148,
+    media_type: 'movie',
+  },
+];
+
+const FALLBACK_TV: TVShow[] = [
+  {
+    id: 1399,
+    name: 'Game of Thrones',
+    overview: 'Seven noble families fight for control of the mythical land of Westeros. Friction between the houses leads to full-scale war.',
+    poster_path: '/1XS1oqL89opfnbLl8WnZY1O1uJx.jpg',
+    backdrop_path: '/zZqpAXxVSBtxV9qPBcscfXBcL2w.jpg',
+    first_air_date: '2011-04-17',
+    vote_average: 8.4,
+    vote_count: 24000,
+    popularity: 130.0,
+    genre_ids: [10765, 18, 10759],
+    number_of_seasons: 8,
+    media_type: 'tv',
+  },
+  {
+    id: 1396,
+    name: 'Breaking Bad',
+    overview: 'Walter White, a New Mexico chemistry teacher, is diagnosed with Stage III cancer and given a prognosis of only two years left to live.',
+    poster_path: '/ztkUQFLlC19CCMYHW9o1zWhJRNq.jpg',
+    backdrop_path: '/tsRy63Mu5cu8etL1X7ZLyf7UP1M.jpg',
+    first_air_date: '2008-01-20',
+    vote_average: 8.9,
+    vote_count: 14000,
+    popularity: 125.0,
+    genre_ids: [18, 80],
+    number_of_seasons: 5,
+    media_type: 'tv',
+  },
+];
+
 export const api = {
   // Movies
   getTrendingMovies: async (page = 1): Promise<Movie[]> => {
-    const res = await tmdbClient.get('/trending/movie/week', { params: { page } });
-    return res.data.results || [];
+    try {
+      const res = await tmdbClient.get('/trending/movie/week', { params: { page } });
+      return res.data.results || [];
+    } catch {
+      return page === 1 ? FALLBACK_MOVIES : [];
+    }
   },
   getPopularMovies: async (page = 1): Promise<Movie[]> => {
-    const res = await tmdbClient.get('/movie/popular', { params: { page } });
-    return res.data.results || [];
+    try {
+      const res = await tmdbClient.get('/movie/popular', { params: { page } });
+      return res.data.results || [];
+    } catch {
+      return page === 1 ? FALLBACK_MOVIES : [];
+    }
   },
   getTopRatedMovies: async (page = 1): Promise<Movie[]> => {
-    const res = await tmdbClient.get('/movie/top_rated', { params: { page } });
-    return res.data.results || [];
+    try {
+      const res = await tmdbClient.get('/movie/top_rated', { params: { page } });
+      return res.data.results || [];
+    } catch {
+      return page === 1 ? FALLBACK_MOVIES : [];
+    }
   },
   getMovieDetails: async (id: number): Promise<Movie> => {
-    const res = await tmdbClient.get(`/movie/${id}`);
-    return res.data;
+    try {
+      const res = await tmdbClient.get(`/movie/${id}`);
+      return res.data;
+    } catch {
+      return (
+        FALLBACK_MOVIES.find((m) => m.id === id) || {
+          ...FALLBACK_MOVIES[0],
+          id,
+          title: `Movie #${id}`,
+          overview: 'Metadata temporarily unavailable. You can still stream this title using the source servers.',
+        }
+      );
+    }
   },
   getMovieCredits: async (id: number): Promise<MediaCredits> => {
-    const res = await tmdbClient.get(`/movie/${id}/credits`);
-    return res.data;
+    try {
+      const res = await tmdbClient.get(`/movie/${id}/credits`);
+      return res.data;
+    } catch {
+      return { id, cast: [] };
+    }
   },
   getSimilarMovies: async (id: number): Promise<Movie[]> => {
-    const res = await tmdbClient.get(`/movie/${id}/similar`);
-    return res.data.results || [];
+    try {
+      const res = await tmdbClient.get(`/movie/${id}/similar`);
+      return res.data.results || [];
+    } catch {
+      return [];
+    }
   },
   getMoviesByGenre: async (genreId: number, page = 1): Promise<Movie[]> => {
-    const res = await tmdbClient.get('/discover/movie', {
-      params: { with_genres: genreId, sort_by: 'popularity.desc', page },
-    });
-    return res.data.results || [];
+    try {
+      const res = await tmdbClient.get('/discover/movie', {
+        params: { with_genres: genreId, sort_by: 'popularity.desc', page },
+      });
+      return res.data.results || [];
+    } catch {
+      return page === 1 ? FALLBACK_MOVIES : [];
+    }
   },
 
   // TV Shows
   getPopularTV: async (page = 1): Promise<TVShow[]> => {
-    const res = await tmdbClient.get('/tv/popular', { params: { page } });
-    return res.data.results || [];
+    try {
+      const res = await tmdbClient.get('/tv/popular', { params: { page } });
+      return res.data.results || [];
+    } catch {
+      return page === 1 ? FALLBACK_TV : [];
+    }
   },
   getTopRatedTV: async (page = 1): Promise<TVShow[]> => {
-    const res = await tmdbClient.get('/tv/top_rated', { params: { page } });
-    return res.data.results || [];
+    try {
+      const res = await tmdbClient.get('/tv/top_rated', { params: { page } });
+      return res.data.results || [];
+    } catch {
+      return page === 1 ? FALLBACK_TV : [];
+    }
   },
   getTVDetails: async (id: number): Promise<TVShow> => {
-    const res = await tmdbClient.get(`/tv/${id}`);
-    return res.data;
+    try {
+      const res = await tmdbClient.get(`/tv/${id}`);
+      return res.data;
+    } catch {
+      return (
+        FALLBACK_TV.find((t) => t.id === id) || {
+          ...FALLBACK_TV[0],
+          id,
+          name: `Series #${id}`,
+          overview: 'Metadata temporarily unavailable. You can still stream this series using the source servers.',
+        }
+      );
+    }
   },
   getTVSeason: async (id: number, season: number): Promise<SeasonDetails> => {
-    const res = await tmdbClient.get(`/tv/${id}/season/${season}`);
-    return res.data;
+    try {
+      const res = await tmdbClient.get(`/tv/${id}/season/${season}`);
+      return res.data;
+    } catch {
+      return {
+        id: season,
+        season_number: season,
+        name: `Season ${season}`,
+        overview: '',
+        poster_path: null,
+        air_date: '',
+        episodes: Array.from({ length: 10 }, (_, idx) => ({
+          id: season * 100 + idx + 1,
+          name: `Episode ${idx + 1}`,
+          overview: '',
+          still_path: null,
+          air_date: '',
+          episode_number: idx + 1,
+          season_number: season,
+          vote_average: 0,
+        })),
+      };
+    }
   },
   getTVCredits: async (id: number): Promise<MediaCredits> => {
-    const res = await tmdbClient.get(`/tv/${id}/credits`);
-    return res.data;
+    try {
+      const res = await tmdbClient.get(`/tv/${id}/credits`);
+      return res.data;
+    } catch {
+      return { id, cast: [] };
+    }
   },
 
   // Search
   search: async (query: string, page = 1): Promise<(Movie | TVShow)[]> => {
-    const res = await tmdbClient.get('/search/multi', { params: { query, page } });
-    return (res.data.results || []).filter((item: any) => item.media_type === 'movie' || item.media_type === 'tv');
+    try {
+      const res = await tmdbClient.get('/search/multi', { params: { query, page } });
+      return (res.data.results || []).filter((item: any) => item.media_type === 'movie' || item.media_type === 'tv');
+    } catch {
+      return [];
+    }
   },
 
   // Discover & Genre Explorer

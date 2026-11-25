@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, usePathname } from 'next/navigation';
 import { Play, Plus, Check, Star, Calendar, ArrowLeft, Film } from 'lucide-react';
 import { useTVDetails, useTVSeason, useTVCredits, useWatchlist } from '../../../hooks/useMedia';
 import { getTmdbImageUrl, formatReleaseYear, formatScore } from '../../../lib/utils';
@@ -13,6 +13,7 @@ import { TrailerModal } from '../../../components/trailer/TrailerModal';
 
 export default function TVDetailsClient({ id }: { id?: string }) {
   const clientParams = useParams();
+  const pathname = usePathname();
   const [resolvedId, setResolvedId] = useState<number>(() => {
     if (typeof window !== 'undefined') {
       const match = window.location.pathname.match(/\/tv\/(\d+)/);
@@ -35,7 +36,7 @@ export default function TVDetailsClient({ id }: { id?: string }) {
         if (!isNaN(parsed) && parsed > 0) setResolvedId(parsed);
       }
     }
-  }, []);
+  }, [pathname, id]);
 
   const tvId = resolvedId;
   const router = useRouter();
