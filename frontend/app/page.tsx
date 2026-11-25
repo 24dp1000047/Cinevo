@@ -40,6 +40,101 @@ const STREAMING_PROVIDERS = [
   { id: 2552, name: 'Apple TV+', badge: 'tv', badgeBg: 'bg-zinc-900 text-white border border-white/20' },
   { id: 4330, name: 'Paramount+', badge: 'P+', badgeBg: 'bg-blue-600 text-white' },
   { id: 453, name: 'Hulu', badge: 'H', badgeBg: 'bg-emerald-500 text-zinc-950' },
+  { id: 3353, name: 'Peacock', badge: 'PC', badgeBg: 'bg-zinc-800 text-white border border-white/20' },
+  { id: 1112, name: 'Crunchyroll', badge: 'CR', badgeBg: 'bg-orange-500 text-white' },
+  { id: 318, name: 'Starz', badge: 'SZ', badgeBg: 'bg-teal-900 text-amber-300 border border-white/20' },
+];
+
+const CHANNELS_APPS = [
+  {
+    providerId: 213,
+    label: 'Netflix',
+    tileClass: 'bg-black border border-white/10',
+    logo: <span className="text-4xl font-black text-[#e50914] tracking-tighter">N</span>,
+  },
+  {
+    providerId: 1024,
+    label: 'Amazon Prime Video',
+    tileClass: 'bg-white text-[#00a8e1]',
+    logo: (
+      <div className="flex flex-col items-center leading-none">
+        <span className="text-sm font-black tracking-tight text-[#00a8e1]">prime</span>
+        <span className="text-sm font-black tracking-tight text-[#00a8e1]">video</span>
+        <span className="w-10 h-1 rounded-full bg-[#00a8e1] mt-1" />
+      </div>
+    ),
+  },
+  {
+    providerId: 2739,
+    label: 'Disney Plus',
+    tileClass: 'bg-gradient-to-b from-[#061830] via-[#0a365c] to-[#0c6978] border border-cyan-400/20',
+    logo: <span className="text-lg font-extrabold tracking-tight text-white">Disney+</span>,
+  },
+  {
+    providerId: 2552,
+    label: 'Apple TV+',
+    tileClass: 'bg-[#09090b] border border-white/15',
+    logo: <span className="text-xl font-bold tracking-tight text-white">tv</span>,
+  },
+  {
+    providerId: 453,
+    label: 'Hulu',
+    tileClass: 'bg-[#1ce783] text-white',
+    logo: <span className="text-2xl font-black tracking-tight text-white drop-shadow-sm">hulu</span>,
+  },
+  {
+    providerId: 49,
+    label: 'HBO Max',
+    tileClass: 'bg-black border border-white/15',
+    logo: (
+      <div className="flex flex-col items-center leading-none text-white">
+        <span className="text-lg font-black tracking-wider">HBO</span>
+        <span className="text-sm font-bold tracking-tight">max</span>
+      </div>
+    ),
+  },
+  {
+    providerId: 4330,
+    label: 'Paramount Plus',
+    tileClass: 'bg-[#0064ff] text-white',
+    logo: (
+      <div className="flex flex-col items-center leading-tight text-white">
+        <span className="text-xs font-extrabold italic tracking-tight">Paramount+</span>
+        <span className="text-[10px] font-semibold opacity-90">Premium</span>
+      </div>
+    ),
+  },
+  {
+    providerId: 3353,
+    label: 'Peacock Premium',
+    tileClass: 'bg-[#1f2024] border border-white/10 text-white',
+    logo: (
+      <div className="flex items-center gap-1">
+        <span className="text-sm font-extrabold tracking-tight text-white">peacock</span>
+        <span className="flex flex-col gap-0.5">
+          <span className="w-1 h-1 rounded-full bg-amber-400" />
+          <span className="w-1 h-1 rounded-full bg-emerald-400" />
+          <span className="w-1 h-1 rounded-full bg-sky-400" />
+        </span>
+      </div>
+    ),
+  },
+  {
+    providerId: 1112,
+    label: 'Crunchyroll',
+    tileClass: 'bg-[#f47521] text-white',
+    logo: (
+      <div className="w-10 h-10 rounded-full border-[5px] border-white flex items-center justify-center relative">
+        <span className="w-4 h-4 rounded-full bg-white translate-x-1" />
+      </div>
+    ),
+  },
+  {
+    providerId: 318,
+    label: 'STARZ',
+    tileClass: 'bg-gradient-to-br from-[#0f292e] to-[#090d10] border border-white/15',
+    logo: <span className="text-lg font-black tracking-widest text-amber-300">STARZ</span>,
+  },
 ];
 
 const THEMATIC_COLLECTIONS = [
@@ -238,8 +333,46 @@ export default function HomePage() {
           />
         </section>
 
-        {/* 2. Only on [Streaming Provider] */}
-        <section className="relative group/row my-8 px-4 md:px-12">
+        {/* 2. Channels & Apps */}
+        <section className="my-8 px-4 md:px-12">
+          <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white flex items-center gap-2.5 mb-4">
+            <span className="w-1 h-6 bg-sky-400 rounded-full inline-block" />
+            <span>Channels &amp; Apps</span>
+          </h2>
+
+          <div className="flex items-start gap-4 overflow-x-auto no-scrollbar py-2">
+            {CHANNELS_APPS.map((app) => {
+              const isSelected = selectedProvider.id === app.providerId;
+              return (
+                <button
+                  key={app.providerId}
+                  type="button"
+                  onClick={() => {
+                    const matched = STREAMING_PROVIDERS.find((p) => p.id === app.providerId);
+                    if (matched) setSelectedProvider(matched);
+                    const el = document.getElementById('only-on-provider');
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }}
+                  className="group flex flex-col items-center gap-2 flex-shrink-0 w-24 sm:w-28 cursor-pointer"
+                >
+                  <div
+                    className={`w-24 h-24 sm:w-28 sm:h-28 rounded-3xl flex items-center justify-center shadow-lg transition-all duration-200 group-hover:scale-105 ${
+                      app.tileClass
+                    } ${isSelected ? 'ring-2 ring-sky-400 ring-offset-2 ring-offset-[#09090b]' : ''}`}
+                  >
+                    {app.logo}
+                  </div>
+                  <span className="text-xs font-medium text-zinc-300 group-hover:text-white text-center leading-tight line-clamp-2">
+                    {app.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* 3. Only on [Streaming Provider] */}
+        <section id="only-on-provider" className="relative group/row my-8 px-4 md:px-12">
           <div className="flex items-center gap-3 mb-4 relative z-30">
             <span className="w-1.5 h-6 bg-brand-red rounded-full inline-block" />
             <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white">Only on</h2>
