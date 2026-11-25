@@ -25,10 +25,10 @@ export default function RootLayout({
       <body className="bg-[#09090b] text-zinc-100 min-h-screen flex flex-col selection:bg-brand-red selection:text-white">
         <QueryProvider>
           <Navbar />
-          <main className="flex-1 shrink-0 pb-16 w-full md:pr-20">{children}</main>
+          <main className="flex-1 shrink-0 pb-16 w-full md:pl-20">{children}</main>
 
           {/* Footer */}
-          <footer className="shrink-0 border-t border-white/5 bg-[#08080a] py-12 px-6 md:px-16 md:pr-28 text-xs text-zinc-500 w-full relative z-10">
+          <footer className="shrink-0 border-t border-white/5 bg-[#08080a] py-12 px-6 md:px-16 md:pl-28 text-xs text-zinc-500 w-full relative z-10">
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="flex items-center gap-2">
                 <span className="font-bold text-white tracking-wider text-sm uppercase">

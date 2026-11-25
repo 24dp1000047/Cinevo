@@ -63,8 +63,8 @@ export function Navbar() {
 
   return (
     <>
-      {/* Desktop Right Vertical Sidebar Rail */}
-      <aside className="hidden md:flex fixed right-0 top-0 bottom-0 w-20 z-40 bg-[#0b0b0e] border-l border-white/5 flex-col items-center justify-between py-5 select-none">
+      {/* Desktop Left Vertical Sidebar Rail */}
+      <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-20 z-40 bg-[#0b0b0e] border-r border-white/5 flex-col items-center justify-between py-5 select-none">
         {/* Top Brand Badge */}
         <Link
           href="/"
@@ -94,7 +94,7 @@ export function Navbar() {
                 className="relative w-full flex items-center justify-center group"
               >
                 {isActive && (
-                  <span className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-7 rounded-l-full bg-amber-400" />
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-7 rounded-r-full bg-amber-400" />
                 )}
                 <span
                   className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-200 ${
@@ -138,7 +138,7 @@ export function Navbar() {
                 className="relative w-full flex items-center justify-center group"
               >
                 {isActive && (
-                  <span className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-7 rounded-l-full bg-amber-400" />
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-7 rounded-r-full bg-amber-400" />
                 )}
                 <span
                   className={`relative w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-200 ${
@@ -166,7 +166,7 @@ export function Navbar() {
           className="relative w-full flex items-center justify-center group"
         >
           {pathname.startsWith('/profile') && (
-            <span className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-7 rounded-l-full bg-amber-400" />
+            <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-7 rounded-r-full bg-amber-400" />
           )}
           <span
             className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-200 ${
