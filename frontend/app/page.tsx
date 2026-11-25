@@ -47,12 +47,14 @@ const STREAMING_PROVIDERS = [
 
 const CHANNELS_APPS = [
   {
+    slug: 'netflix',
     providerId: 213,
     label: 'Netflix',
     tileClass: 'bg-black border border-white/10',
     logo: <span className="text-4xl font-black text-[#e50914] tracking-tighter">N</span>,
   },
   {
+    slug: 'prime-video',
     providerId: 1024,
     label: 'Amazon Prime Video',
     tileClass: 'bg-white text-[#00a8e1]',
@@ -65,24 +67,28 @@ const CHANNELS_APPS = [
     ),
   },
   {
+    slug: 'disney-plus',
     providerId: 2739,
     label: 'Disney Plus',
     tileClass: 'bg-gradient-to-b from-[#061830] via-[#0a365c] to-[#0c6978] border border-cyan-400/20',
     logo: <span className="text-lg font-extrabold tracking-tight text-white">Disney+</span>,
   },
   {
+    slug: 'apple-tv',
     providerId: 2552,
     label: 'Apple TV+',
     tileClass: 'bg-[#09090b] border border-white/15',
     logo: <span className="text-xl font-bold tracking-tight text-white">tv</span>,
   },
   {
+    slug: 'hulu',
     providerId: 453,
     label: 'Hulu',
     tileClass: 'bg-[#1ce783] text-white',
     logo: <span className="text-2xl font-black tracking-tight text-white drop-shadow-sm">hulu</span>,
   },
   {
+    slug: 'hbo-max',
     providerId: 49,
     label: 'HBO Max',
     tileClass: 'bg-black border border-white/15',
@@ -94,6 +100,7 @@ const CHANNELS_APPS = [
     ),
   },
   {
+    slug: 'paramount-plus',
     providerId: 4330,
     label: 'Paramount Plus',
     tileClass: 'bg-[#0064ff] text-white',
@@ -105,6 +112,7 @@ const CHANNELS_APPS = [
     ),
   },
   {
+    slug: 'peacock',
     providerId: 3353,
     label: 'Peacock Premium',
     tileClass: 'bg-[#1f2024] border border-white/10 text-white',
@@ -120,6 +128,7 @@ const CHANNELS_APPS = [
     ),
   },
   {
+    slug: 'crunchyroll',
     providerId: 1112,
     label: 'Crunchyroll',
     tileClass: 'bg-[#f47521] text-white',
@@ -130,6 +139,7 @@ const CHANNELS_APPS = [
     ),
   },
   {
+    slug: 'starz',
     providerId: 318,
     label: 'STARZ',
     tileClass: 'bg-gradient-to-br from-[#0f292e] to-[#090d10] border border-white/15',
@@ -190,6 +200,7 @@ export default function HomePage() {
   const [isProviderOpen, setIsProviderOpen] = useState(false);
 
   const providerDropdownRef = useRef<HTMLDivElement>(null);
+  const channelsRowRef = useRef<HTMLDivElement>(null);
   const providerRowRef = useRef<HTMLDivElement>(null);
   const theatreRowRef = useRef<HTMLDivElement>(null);
 
@@ -334,40 +345,52 @@ export default function HomePage() {
         </section>
 
         {/* 2. Channels & Apps */}
-        <section className="my-8 px-4 md:px-12">
+        <section className="relative group/channels my-8 px-4 md:px-12">
           <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white flex items-center gap-2.5 mb-4">
             <span className="w-1 h-6 bg-sky-400 rounded-full inline-block" />
             <span>Channels &amp; Apps</span>
           </h2>
 
-          <div className="flex items-start gap-4 overflow-x-auto no-scrollbar py-2">
-            {CHANNELS_APPS.map((app) => {
-              const isSelected = selectedProvider.id === app.providerId;
-              return (
-                <button
-                  key={app.providerId}
-                  type="button"
-                  onClick={() => {
-                    const matched = STREAMING_PROVIDERS.find((p) => p.id === app.providerId);
-                    if (matched) setSelectedProvider(matched);
-                    const el = document.getElementById('only-on-provider');
-                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  }}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => scrollRow(channelsRowRef, 'left')}
+              className="absolute -left-2 md:-left-4 top-12 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/80 hover:bg-black border border-white/15 text-white backdrop-blur-md flex items-center justify-center shadow-xl opacity-0 group-hover/channels:opacity-100 transition-all hover:scale-105 cursor-pointer"
+              aria-label="Scroll channels left"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+
+            <div
+              ref={channelsRowRef}
+              className="flex items-start gap-4 overflow-x-auto no-scrollbar scroll-smooth py-2"
+            >
+              {CHANNELS_APPS.map((app) => (
+                <Link
+                  key={app.slug}
+                  href={`/channel/${app.slug}`}
                   className="group flex flex-col items-center gap-2 flex-shrink-0 w-24 sm:w-28 cursor-pointer"
                 >
                   <div
-                    className={`w-24 h-24 sm:w-28 sm:h-28 rounded-3xl flex items-center justify-center shadow-lg transition-all duration-200 group-hover:scale-105 ${
-                      app.tileClass
-                    } ${isSelected ? 'ring-2 ring-sky-400 ring-offset-2 ring-offset-[#09090b]' : ''}`}
+                    className={`w-24 h-24 sm:w-28 sm:h-28 rounded-3xl flex items-center justify-center shadow-lg transition-all duration-200 group-hover:scale-105 ${app.tileClass}`}
                   >
                     {app.logo}
                   </div>
                   <span className="text-xs font-medium text-zinc-300 group-hover:text-white text-center leading-tight line-clamp-2">
                     {app.label}
                   </span>
-                </button>
-              );
-            })}
+                </Link>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => scrollRow(channelsRowRef, 'right')}
+              className="absolute -right-2 md:-right-4 top-12 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/80 hover:bg-black border border-white/15 text-white backdrop-blur-md flex items-center justify-center shadow-xl transition-all hover:scale-105 cursor-pointer"
+              aria-label="Scroll channels right"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
           </div>
         </section>
 

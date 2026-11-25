@@ -563,6 +563,37 @@ export const api = {
       return page === 1 ? FALLBACK_TV : [];
     }
   },
+  getByWatchProvider: async (
+    mediaType: 'movie' | 'tv',
+    watchProviderId: number,
+    page = 1,
+    networkId?: number
+  ): Promise<(Movie | TVShow)[]> => {
+    try {
+      const endpoint = mediaType === 'tv' ? '/discover/tv' : '/discover/movie';
+      const res = await tmdbClient.get(endpoint, {
+        params: {
+          with_watch_providers: watchProviderId,
+          watch_region: 'US',
+          sort_by: 'popularity.desc',
+          page,
+        },
+      });
+      const results = res.data.results || [];
+      if (results.length > 0) {
+        return results.map((item: any) => ({ ...item, media_type: mediaType }));
+      }
+      if (mediaType === 'tv' && networkId) {
+        return await api.getTVByNetwork(networkId, page);
+      }
+      return [];
+    } catch {
+      if (mediaType === 'tv' && networkId) {
+        return await api.getTVByNetwork(networkId, page);
+      }
+      return page === 1 ? (mediaType === 'tv' ? FALLBACK_TV : FALLBACK_MOVIES) : [];
+    }
+  },
   getTVDetails: async (id: number): Promise<TVShow> => {
     try {
       const res = await tmdbClient.get(`/tv/${id}`);
