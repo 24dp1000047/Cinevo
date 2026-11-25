@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Search as SearchIcon, X, Film, Tv, Star, Play } from 'lucide-react';
 import Link from 'next/link';
@@ -14,6 +14,8 @@ function SearchPageContent() {
   const initialQ = searchParams.get('q') || '';
   const [query, setQuery] = useState(initialQ);
   const [debouncedQuery, setDebouncedQuery] = useState(initialQ);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const searchWrapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (initialQ) {
@@ -25,42 +27,104 @@ function SearchPageContent() {
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedQuery(query);
-    }, 300);
+    }, 200);
     return () => clearTimeout(handler);
   }, [query]);
 
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchWrapRef.current && !searchWrapRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const { data: results = [], isLoading } = useSearch(debouncedQuery);
+  const dropdownSuggestions = results.slice(0, 6);
 
   return (
     <div className="pt-24 md:pt-10 pb-20 px-4 md:px-12 max-w-7xl mx-auto min-h-screen">
-      {/* Search Input Hero */}
-      <div className="max-w-2xl mx-auto mb-12">
+      {/* Search Input Hero with Amber Focus & Detached Dropdown */}
+      <div ref={searchWrapRef} className="relative max-w-2xl mx-auto mb-12">
         <h1 className="text-3xl font-extrabold text-white text-center mb-6">Search Cinevo</h1>
-        <div className="relative flex items-center bg-zinc-900 border border-white/10 rounded-2xl p-2 shadow-2xl focus-within:border-brand-red transition">
-          <SearchIcon className="w-6 h-6 text-zinc-400 ml-3" />
+        <div className="relative flex items-center bg-[#121215] border border-white/15 focus-within:border-amber-400/75 focus-within:ring-2 focus-within:ring-amber-400/20 rounded-xl px-4 py-3 shadow-2xl transition">
+          <SearchIcon className="w-4 h-4 text-zinc-500 flex-shrink-0" />
           <input
             type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search movies, series, characters..."
-            className="w-full bg-transparent px-4 py-2.5 text-lg text-white placeholder-zinc-500 focus:outline-none"
+            onFocus={() => setShowDropdown(true)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setShowDropdown(true);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape' || e.key === 'Enter') {
+                setShowDropdown(false);
+              }
+            }}
+            placeholder="Search movies, series..."
+            className="w-full bg-transparent px-3 text-base text-white placeholder-zinc-500 focus:outline-none"
             autoFocus
           />
           {query && (
             <button
-              onClick={() => setQuery('')}
-              className="p-2 text-zinc-400 hover:text-white mr-1"
+              onClick={() => {
+                setQuery('');
+                setDebouncedQuery('');
+              }}
+              className="p-1 text-zinc-500 hover:text-white transition"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           )}
         </div>
+
+        {/* Detached Minimal Dropdown Suggestions */}
+        {showDropdown && query.trim().length > 0 && dropdownSuggestions.length > 0 && (
+          <div className="absolute left-0 right-0 top-full mt-2.5 z-40 rounded-2xl bg-[#111215] border border-white/10 shadow-2xl overflow-hidden py-1.5 max-h-96 overflow-y-auto">
+            {dropdownSuggestions.map((item) => {
+              const isMovie = (item as Movie).title !== undefined;
+              const type = isMovie ? 'movie' : 'tv';
+              const title = (item as Movie).title || (item as TVShow).name || 'Untitled';
+              const date = (item as Movie).release_date || (item as TVShow).first_air_date;
+              const year = formatReleaseYear(date);
+
+              return (
+                <Link
+                  key={`dd-${type}-${item.id}`}
+                  href={`/${type}/${item.id}`}
+                  onClick={() => setShowDropdown(false)}
+                  className="flex items-center gap-3.5 px-4 py-2.5 hover:bg-white/[0.05] transition-colors"
+                >
+                  <div className="relative w-10 h-14 rounded-lg overflow-hidden bg-zinc-800 flex-shrink-0">
+                    <Image
+                      src={getTmdbImageUrl(item.poster_path, 'w500')}
+                      alt={title}
+                      fill
+                      sizes="40px"
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold text-white truncate">{title}</p>
+                    <p className="text-xs font-medium text-zinc-400 mt-0.5 uppercase tracking-wide">
+                      {type === 'movie' ? 'MOVIE' : 'TV'}
+                      {year ? ` · ${year}` : ''}
+                    </p>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </div>
 
-      {/* Status & Results */}
+      {/* Status & Results Grid */}
       {isLoading && (
         <div className="flex items-center justify-center py-20 text-zinc-400">
-          <div className="w-8 h-8 border-2 border-brand-red border-t-transparent rounded-full animate-spin mr-3" />
+          <div className="w-8 h-8 border-2 border-amber-400 border-t-transparent rounded-full animate-spin mr-3" />
           <span>Searching cinema database...</span>
         </div>
       )}
@@ -136,7 +200,7 @@ export default function SearchPage() {
     <Suspense
       fallback={
         <div className="min-h-screen flex items-center justify-center">
-          <div className="w-8 h-8 border-2 border-brand-red border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
         </div>
       }
     >

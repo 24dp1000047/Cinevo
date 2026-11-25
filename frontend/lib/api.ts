@@ -643,7 +643,7 @@ export const api = {
     }
   },
 
-  // Search (with franchise collection expansion + chronological ordering)
+  // Search (with franchise collection expansion in chronological order + relevance for non-franchise queries)
   search: async (query: string, page = 1): Promise<(Movie | TVShow)[]> => {
     try {
       const res = await tmdbClient.get('/search/multi', { params: { query, page } });
@@ -654,12 +654,22 @@ export const api = {
       const getDateKey = (item: Movie | TVShow) =>
         (item as Movie).release_date || (item as TVShow).first_air_date || '9999-12-31';
 
-      // On page 1, expand the top movie's TMDB collection so every part of the franchise is included
-      if (page === 1) {
-        const topMovie = rawResults.find((item) => item.media_type === 'movie');
-        if (topMovie) {
+      // On page 1, if the top match is a movie (or top 2 has a movie matching query),
+      // expand its TMDB collection so every part of the franchise appears in chronological order.
+      if (page === 1 && rawResults.length > 0) {
+        const normalizedQuery = query.trim().toLowerCase();
+        const candidateMovie =
+          rawResults[0]?.media_type === 'movie'
+            ? rawResults[0]
+            : rawResults.slice(0, 3).find((item) => {
+                if (item.media_type !== 'movie') return false;
+                const title = ((item as Movie).title || '').toLowerCase();
+                return title.includes(normalizedQuery);
+              });
+
+        if (candidateMovie) {
           try {
-            const detailsRes = await tmdbClient.get(`/movie/${topMovie.id}`);
+            const detailsRes = await tmdbClient.get(`/movie/${candidateMovie.id}`);
             const collectionId = detailsRes.data?.belongs_to_collection?.id;
             if (collectionId) {
               const colRes = await tmdbClient.get(`/collection/${collectionId}`);
@@ -678,19 +688,20 @@ export const api = {
                   return true;
                 });
 
-              const remaining = rawResults
-                .filter((item) => !seen.has(`${item.media_type}-${item.id}`))
-                .sort((a, b) => getDateKey(a).localeCompare(getDateKey(b)));
+              const remaining = rawResults.filter(
+                (item) => !seen.has(`${item.media_type}-${item.id}`)
+              );
 
+              // If top result was a TV show (e.g. "Avatar" TV vs Movie), keep non-collection matches after franchise parts
               return [...sortedParts, ...remaining];
             }
           } catch {
-            // Fall through to standard chronological sort
+            // Fall through to standard results
           }
         }
       }
 
-      return [...rawResults].sort((a, b) => getDateKey(a).localeCompare(getDateKey(b)));
+      return rawResults;
     } catch {
       return [];
     }
