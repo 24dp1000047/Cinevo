@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Search as SearchIcon, X, Film, Tv, Star, Play } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -8,9 +9,18 @@ import { useSearch } from '../../hooks/useMedia';
 import { getTmdbImageUrl, formatScore, formatReleaseYear } from '../../lib/utils';
 import { Movie, TVShow } from '../../types';
 
-export default function SearchPage() {
-  const [query, setQuery] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
+function SearchPageContent() {
+  const searchParams = useSearchParams();
+  const initialQ = searchParams.get('q') || '';
+  const [query, setQuery] = useState(initialQ);
+  const [debouncedQuery, setDebouncedQuery] = useState(initialQ);
+
+  useEffect(() => {
+    if (initialQ) {
+      setQuery(initialQ);
+      setDebouncedQuery(initialQ);
+    }
+  }, [initialQ]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -22,7 +32,7 @@ export default function SearchPage() {
   const { data: results = [], isLoading } = useSearch(debouncedQuery);
 
   return (
-    <div className="pt-24 pb-20 px-4 md:px-12 max-w-7xl mx-auto min-h-screen">
+    <div className="pt-24 md:pt-10 pb-20 px-4 md:px-12 max-w-7xl mx-auto min-h-screen">
       {/* Search Input Hero */}
       <div className="max-w-2xl mx-auto mb-12">
         <h1 className="text-3xl font-extrabold text-white text-center mb-6">Search Cinevo</h1>
@@ -118,5 +128,19 @@ export default function SearchPage() {
         })}
       </div>
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="w-8 h-8 border-2 border-brand-red border-t-transparent rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <SearchPageContent />
+    </Suspense>
   );
 }

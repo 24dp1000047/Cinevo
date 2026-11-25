@@ -24,6 +24,13 @@ export function useTopRatedMovies(page = 1) {
   });
 }
 
+export function useNowPlayingMovies(page = 1) {
+  return useQuery({
+    queryKey: ['movies', 'nowPlaying', page],
+    queryFn: () => api.getNowPlayingMovies(page),
+  });
+}
+
 export function useMoviesByGenre(genreId: number, page = 1) {
   return useQuery({
     queryKey: ['movies', 'genre', genreId, page],
@@ -67,6 +74,14 @@ export function useTopRatedTV(page = 1) {
   return useQuery({
     queryKey: ['tv', 'topRated', page],
     queryFn: () => api.getTopRatedTV(page),
+  });
+}
+
+export function useTVByNetwork(networkId: number, page = 1) {
+  return useQuery({
+    queryKey: ['tv', 'network', networkId, page],
+    queryFn: () => api.getTVByNetwork(networkId, page),
+    enabled: Boolean(networkId),
   });
 }
 

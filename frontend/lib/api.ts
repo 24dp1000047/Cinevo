@@ -486,6 +486,14 @@ export const api = {
       return page === 1 ? FALLBACK_MOVIES : [];
     }
   },
+  getNowPlayingMovies: async (page = 1): Promise<Movie[]> => {
+    try {
+      const res = await tmdbClient.get('/movie/now_playing', { params: { page } });
+      return res.data.results || [];
+    } catch {
+      return page === 1 ? FALLBACK_MOVIES : [];
+    }
+  },
   getMovieDetails: async (id: number): Promise<Movie> => {
     try {
       const res = await tmdbClient.get(`/movie/${id}`);
@@ -541,6 +549,16 @@ export const api = {
     try {
       const res = await tmdbClient.get('/tv/top_rated', { params: { page } });
       return res.data.results || [];
+    } catch {
+      return page === 1 ? FALLBACK_TV : [];
+    }
+  },
+  getTVByNetwork: async (networkId: number, page = 1): Promise<TVShow[]> => {
+    try {
+      const res = await tmdbClient.get('/discover/tv', {
+        params: { with_networks: networkId, sort_by: 'popularity.desc', page },
+      });
+      return (res.data.results || []).map((item: any) => ({ ...item, media_type: 'tv' as const }));
     } catch {
       return page === 1 ? FALLBACK_TV : [];
     }

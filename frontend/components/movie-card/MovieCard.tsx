@@ -68,12 +68,36 @@ export function MovieCard({ item, mediaType, priority = false, className }: Movi
             />
           </Link>
 
+          {/* Top Badges (Type & Rating) */}
+          <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between gap-2 z-10 pointer-events-none">
+            <span className="px-2 py-0.5 rounded-md bg-black/70 backdrop-blur-md border border-white/10 text-[10px] font-bold uppercase tracking-wider text-zinc-200">
+              {type === 'movie' ? 'MOVIE' : 'TV SERIES'}
+            </span>
+            <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-600/85 backdrop-blur-md text-white text-[11px] font-bold shadow">
+              <Star className="w-3 h-3 fill-current" />
+              {formatScore(item.vote_average)}
+            </span>
+          </div>
+
+          {/* Bottom Title & Metadata Inside Poster */}
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-3 pt-10 z-10 pointer-events-none">
+            <h3 className="text-sm font-bold text-white truncate drop-shadow">{title}</h3>
+            <div className="flex items-center gap-1.5 text-[11px] text-zinc-300 mt-0.5 font-medium">
+              <span>{formatReleaseYear(releaseDate) || '—'}</span>
+              <span>•</span>
+              <span className="px-1 py-0.2 rounded bg-white/10 text-[10px] font-semibold tracking-wide text-zinc-200">
+                4K
+              </span>
+              <span className="text-[10px] font-semibold text-zinc-400">HD</span>
+            </div>
+          </div>
+
           {/* Hover Action Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3 pointer-events-none z-10">
-            <div className="flex items-center gap-2 mb-2 pointer-events-auto">
+          <div className="absolute inset-0 bg-black/55 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-center justify-center p-3 pointer-events-none z-20">
+            <div className="flex items-center gap-2.5 pointer-events-auto">
               <Link
                 href={watchUrl}
-                className="flex items-center justify-center w-9 h-9 rounded-full bg-brand-red text-white hover:bg-red-700 transition shadow-lg shadow-red-900/40"
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-brand-red text-white hover:bg-red-700 transition shadow-lg shadow-red-900/40 hover:scale-110"
                 title="Watch Now"
               >
                 <Play className="w-4 h-4 fill-current ml-0.5" />
@@ -85,7 +109,7 @@ export function MovieCard({ item, mediaType, priority = false, className }: Movi
                   e.stopPropagation();
                   setIsTrailerOpen(true);
                 }}
-                className="flex items-center justify-center w-9 h-9 rounded-full bg-zinc-800/80 border border-white/20 text-zinc-300 hover:border-red-500/60 hover:text-white transition backdrop-blur-md"
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-zinc-900/90 border border-white/20 text-zinc-200 hover:border-red-500/60 hover:text-white transition backdrop-blur-md hover:scale-110"
                 title="Preview Trailer"
               >
                 <Film className="w-4 h-4 text-brand-red" />
@@ -93,37 +117,16 @@ export function MovieCard({ item, mediaType, priority = false, className }: Movi
 
               <button
                 onClick={handleToggleWatchlist}
-                className={`flex items-center justify-center w-9 h-9 rounded-full border transition backdrop-blur-md ${
+                className={`flex items-center justify-center w-10 h-10 rounded-full border transition backdrop-blur-md hover:scale-110 ${
                   isBookmarked
-                    ? 'bg-zinc-800/80 border-emerald-500/60 text-emerald-400'
-                    : 'bg-zinc-800/80 border-white/20 text-white hover:border-white/60'
+                    ? 'bg-zinc-900/90 border-emerald-500/60 text-emerald-400'
+                    : 'bg-zinc-900/90 border-white/20 text-white hover:border-white/60'
                 }`}
                 title={isBookmarked ? 'In Watchlist' : 'Add to Watchlist'}
               >
                 {isBookmarked ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
               </button>
             </div>
-
-            <Link href={detailsUrl} className="pointer-events-auto flex items-center gap-2 text-xs text-zinc-300">
-              <span className="flex items-center gap-1 font-semibold text-amber-400">
-                <Star className="w-3.5 h-3.5 fill-current" />
-                {formatScore(item.vote_average)}
-              </span>
-              <span>•</span>
-              <span>{formatReleaseYear(releaseDate)}</span>
-            </Link>
-          </div>
-        </div>
-
-        <div className="mt-2 px-1">
-          <Link href={detailsUrl} className="block font-medium text-sm text-zinc-200 truncate group-hover/card:text-white transition">
-            {title}
-          </Link>
-          <div className="flex items-center justify-between text-xs text-zinc-400 mt-0.5">
-            <span>{formatReleaseYear(releaseDate)}</span>
-            <span className="capitalize text-[11px] px-1.5 py-0.5 rounded bg-zinc-800/70 border border-white/5">
-              {type === 'movie' ? 'Movie' : 'Series'}
-            </span>
           </div>
         </div>
       </div>
