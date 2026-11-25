@@ -3,7 +3,19 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, Film, Bookmark, Settings, Menu, X } from 'lucide-react';
+import {
+  Home,
+  Search,
+  Clapperboard,
+  Tv,
+  Compass,
+  Bookmark,
+  Clock,
+  Settings,
+  Film,
+  Menu,
+  X,
+} from 'lucide-react';
 import { SearchOverlay } from '../search/SearchOverlay';
 import { useWatchlist } from '../../hooks/useMedia';
 
@@ -34,119 +46,183 @@ export function Navbar() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const navLinks = [
-    { name: 'Home', href: '/' },
-    { name: 'Discover', href: '/discover' },
-    { name: 'Movies', href: '/movies' },
-    { name: 'Series', href: '/series' },
-    { name: 'My List', href: '/my-list', badge: watchlist.length > 0 ? watchlist.length : undefined },
-    { name: 'History', href: '/history' },
+  const navItems = [
+    { name: 'Home', href: '/', icon: Home, match: (p: string) => p === '/' },
+    { name: 'Movies', href: '/movies', icon: Clapperboard, match: (p: string) => p.startsWith('/movies') || p.startsWith('/movie/') },
+    { name: 'Series', href: '/series', icon: Tv, match: (p: string) => p.startsWith('/series') || p.startsWith('/tv/') },
+    { name: 'Discover', href: '/discover', icon: Compass, match: (p: string) => p.startsWith('/discover') },
+    {
+      name: 'My List',
+      href: '/my-list',
+      icon: Bookmark,
+      badge: watchlist.length > 0 ? watchlist.length : undefined,
+      match: (p: string) => p.startsWith('/my-list'),
+    },
+    { name: 'History', href: '/history', icon: Clock, match: (p: string) => p.startsWith('/history') },
   ];
 
   return (
     <>
+      {/* Desktop Right Vertical Sidebar Rail */}
+      <aside className="hidden md:flex fixed right-0 top-0 bottom-0 w-20 z-40 bg-[#0b0b0e] border-l border-white/5 flex-col items-center justify-between py-5 select-none">
+        {/* Top Brand Badge */}
+        <Link
+          href="/"
+          title="Cinevo Home"
+          className="w-12 h-12 rounded-2xl bg-[#16161b] border border-white/10 hover:border-brand-red/50 flex flex-col items-center justify-center shadow-lg transition group"
+        >
+          <span className="text-lg font-black leading-none text-brand-red group-hover:scale-110 transition-transform">
+            C
+          </span>
+          <span className="text-[8px] font-extrabold tracking-widest text-zinc-300 mt-0.5">
+            CINEVO
+          </span>
+        </Link>
+
+        {/* Center Navigation Icons */}
+        <nav className="flex flex-col items-center gap-3 w-full">
+          {/* Home */}
+          {(() => {
+            const item = navItems[0];
+            const Icon = item.icon;
+            const isActive = item.match(pathname);
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                title={item.name}
+                className="relative w-full flex items-center justify-center group"
+              >
+                {isActive && (
+                  <span className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-7 rounded-l-full bg-amber-400" />
+                )}
+                <span
+                  className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-200 ${
+                    isActive
+                      ? 'bg-[#222228] text-white shadow-md'
+                      : 'text-zinc-500 hover:text-zinc-200 hover:bg-white/5'
+                  }`}
+                >
+                  <Icon className="w-5 h-5 stroke-[1.8]" />
+                </span>
+              </Link>
+            );
+          })()}
+
+          {/* Search Trigger */}
+          <button
+            onClick={() => setIsSearchOpen(true)}
+            title="Search (Ctrl+K)"
+            className="relative w-full flex items-center justify-center group cursor-pointer"
+          >
+            <span
+              className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-200 ${
+                isSearchOpen
+                  ? 'bg-[#222228] text-white shadow-md'
+                  : 'text-zinc-500 hover:text-zinc-200 hover:bg-white/5'
+              }`}
+            >
+              <Search className="w-5 h-5 stroke-[1.8]" />
+            </span>
+          </button>
+
+          {/* Remaining Nav Links */}
+          {navItems.slice(1).map((item) => {
+            const Icon = item.icon;
+            const isActive = item.match(pathname);
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                title={item.name}
+                className="relative w-full flex items-center justify-center group"
+              >
+                {isActive && (
+                  <span className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-7 rounded-l-full bg-amber-400" />
+                )}
+                <span
+                  className={`relative w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-200 ${
+                    isActive
+                      ? 'bg-[#222228] text-white shadow-md'
+                      : 'text-zinc-500 hover:text-zinc-200 hover:bg-white/5'
+                  }`}
+                >
+                  <Icon className="w-5 h-5 stroke-[1.8]" />
+                  {item.badge !== undefined && (
+                    <span className="absolute top-1.5 right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-brand-red text-white text-[9px] font-bold flex items-center justify-center">
+                      {item.badge}
+                    </span>
+                  )}
+                </span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Bottom Preferences / Settings */}
+        <Link
+          href="/profile"
+          title="Preferences & Settings"
+          className="relative w-full flex items-center justify-center group"
+        >
+          {pathname.startsWith('/profile') && (
+            <span className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-7 rounded-l-full bg-amber-400" />
+          )}
+          <span
+            className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-200 ${
+              pathname.startsWith('/profile')
+                ? 'bg-[#222228] text-white shadow-md'
+                : 'text-zinc-500 hover:text-zinc-200 hover:bg-white/5'
+            }`}
+          >
+            <Settings className="w-5 h-5 stroke-[1.8]" />
+          </span>
+        </Link>
+      </aside>
+
+      {/* Mobile Top Header */}
       <header
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
-          isScrolled ? 'glass-nav py-3' : 'bg-gradient-to-b from-black/90 via-black/40 to-transparent py-5'
+        className={`md:hidden fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
+          isScrolled ? 'glass-nav py-3' : 'bg-gradient-to-b from-black/90 via-black/40 to-transparent py-4'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between">
-          {/* Left: Brand Logo & Navigation */}
-          <div className="flex items-center gap-8">
-            <Link href="/" className="flex items-center gap-2 group">
-              <span className="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-red to-red-500 flex items-center justify-center shadow-lg shadow-red-900/40 group-hover:scale-105 transition-transform">
-                <Film className="w-5 h-5 text-white" />
-              </span>
-              <span className="text-2xl font-black tracking-wider text-white uppercase">
-                CINE<span className="text-brand-red">VO</span>
-              </span>
-            </Link>
+        <div className="px-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2 group">
+            <span className="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-red to-red-500 flex items-center justify-center shadow-lg shadow-red-900/40">
+              <Film className="w-4 h-4 text-white" />
+            </span>
+            <span className="text-xl font-black tracking-wider text-white uppercase">
+              CINE<span className="text-brand-red">VO</span>
+            </span>
+          </Link>
 
-            {/* Desktop Navigation Links */}
-            <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-              {navLinks.map((link) => {
-                const isActive = pathname === link.href;
-                return (
-                  <Link
-                    key={link.name}
-                    href={link.href}
-                    className={`relative py-1 transition-colors flex items-center gap-1.5 ${
-                      isActive ? 'text-white font-semibold' : 'text-zinc-400 hover:text-zinc-200'
-                    }`}
-                  >
-                    <span>{link.name}</span>
-                    {link.badge !== undefined && (
-                      <span className="px-1.5 py-0.2 text-[10px] rounded-full bg-brand-red text-white font-bold">
-                        {link.badge}
-                      </span>
-                    )}
-                    {isActive && (
-                      <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-red rounded-full" />
-                    )}
-                  </Link>
-                );
-              })}
-            </nav>
-          </div>
-
-          {/* Right: Search, My List & Preferences */}
-          <div className="flex items-center gap-3">
-            {/* Search Button with Hotkey Pill */}
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setIsSearchOpen(true)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 hover:text-white transition group"
-              title="Search (Ctrl+K)"
+              className="p-2 rounded-full bg-white/5 border border-white/10 text-zinc-300 hover:text-white"
+              title="Search"
             >
-              <Search className="w-4 h-4 text-zinc-400 group-hover:text-white transition" />
-              <span className="hidden md:inline text-xs text-zinc-400 group-hover:text-zinc-200">Search</span>
-              <kbd className="hidden lg:inline-flex items-center text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-800/80 text-zinc-400 border border-white/10">
-                ⌘K
-              </kbd>
+              <Search className="w-4 h-4" />
             </button>
-
-            {/* Quick My List Link */}
-            <Link
-              href="/my-list"
-              className="hidden sm:flex items-center gap-1.5 p-2 rounded-full hover:bg-white/10 text-zinc-300 hover:text-white transition relative"
-              title="My Bookmarks"
-            >
-              <Bookmark className="w-5 h-5" />
-              {watchlist.length > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-brand-red text-white text-[10px] font-bold flex items-center justify-center">
-                  {watchlist.length}
-                </span>
-              )}
-            </Link>
-
-            {/* Preferences / Settings Link */}
-            <Link
-              href="/profile"
-              className="flex items-center gap-2 p-2.5 rounded-full hover:bg-white/10 text-zinc-300 hover:text-white transition"
-              title="Preferences & Settings"
-            >
-              <Settings className="w-5 h-5" />
-            </Link>
-
-            {/* Mobile Menu Toggle */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 text-zinc-300 hover:text-white"
+              className="p-2 text-zinc-300 hover:text-white"
+              aria-label="Toggle Menu"
             >
               {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Navigation Drawer */}
         {isMobileMenuOpen && (
-          <div className="md:hidden glass-card mt-3 mx-4 p-4 rounded-2xl flex flex-col gap-3 animate-scale-in">
-            {navLinks.map((link) => (
+          <div className="glass-card mt-3 mx-4 p-4 rounded-2xl flex flex-col gap-2 animate-scale-in">
+            {navItems.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`flex items-center justify-between py-2 px-3 rounded-lg text-sm font-medium ${
-                  pathname === link.href ? 'bg-brand-red text-white' : 'text-zinc-300 hover:bg-white/5'
+                  link.match(pathname) ? 'bg-brand-red text-white' : 'text-zinc-300 hover:bg-white/5'
                 }`}
               >
                 <span>{link.name}</span>

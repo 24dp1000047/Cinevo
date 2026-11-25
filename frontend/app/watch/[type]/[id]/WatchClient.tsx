@@ -150,7 +150,7 @@ export default function WatchClient({
   const backUrl = mediaType === 'movie' ? `/movie/${id}` : `/tv/${id}`;
 
   return (
-    <div className="min-h-screen bg-[#070709] flex flex-col pt-16 pb-20">
+    <div className="min-h-screen bg-[#070709] flex flex-col pt-16 md:pt-6 pb-20">
       {/* Main Cinema Player Container */}
       <div className="w-full max-w-7xl mx-auto px-0 md:px-6">
         {isStreamLoading ? (
