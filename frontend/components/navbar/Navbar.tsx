@@ -90,7 +90,7 @@ export function Navbar() {
               <Link
                 key={item.name}
                 href={item.href}
-                title={item.name}
+                aria-label={item.name}
                 className="relative w-full flex items-center justify-center group"
               >
                 {isActive && (
@@ -105,6 +105,9 @@ export function Navbar() {
                 >
                   <Icon className="w-5 h-5 stroke-[1.8]" />
                 </span>
+                <span className="pointer-events-none absolute left-full ml-3 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-xl bg-zinc-900/95 text-white text-xs font-semibold border border-white/10 shadow-xl whitespace-nowrap opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 z-50">
+                  {item.name}
+                </span>
               </Link>
             );
           })()}
@@ -112,7 +115,7 @@ export function Navbar() {
           {/* Search Trigger */}
           <button
             onClick={() => setIsSearchOpen(true)}
-            title="Search (Ctrl+K)"
+            aria-label="Search"
             className="relative w-full flex items-center justify-center group cursor-pointer"
           >
             <span
@@ -124,6 +127,12 @@ export function Navbar() {
             >
               <Search className="w-5 h-5 stroke-[1.8]" />
             </span>
+            <span className="pointer-events-none absolute left-full ml-3 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-xl bg-zinc-900/95 text-white text-xs font-semibold border border-white/10 shadow-xl whitespace-nowrap opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 z-50 flex items-center gap-2">
+              <span>Search</span>
+              <kbd className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-white/10">
+                ⌘K
+              </kbd>
+            </span>
           </button>
 
           {/* Remaining Nav Links */}
@@ -134,7 +143,7 @@ export function Navbar() {
               <Link
                 key={item.name}
                 href={item.href}
-                title={item.name}
+                aria-label={item.name}
                 className="relative w-full flex items-center justify-center group"
               >
                 {isActive && (
@@ -154,6 +163,9 @@ export function Navbar() {
                     </span>
                   )}
                 </span>
+                <span className="pointer-events-none absolute left-full ml-3 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-xl bg-zinc-900/95 text-white text-xs font-semibold border border-white/10 shadow-xl whitespace-nowrap opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 z-50">
+                  {item.name}
+                </span>
               </Link>
             );
           })}
@@ -162,7 +174,7 @@ export function Navbar() {
         {/* Bottom Preferences / Settings */}
         <Link
           href="/profile"
-          title="Preferences & Settings"
+          aria-label="Preferences"
           className="relative w-full flex items-center justify-center group"
         >
           {pathname.startsWith('/profile') && (
@@ -176,6 +188,9 @@ export function Navbar() {
             }`}
           >
             <Settings className="w-5 h-5 stroke-[1.8]" />
+          </span>
+          <span className="pointer-events-none absolute left-full ml-3 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-xl bg-zinc-900/95 text-white text-xs font-semibold border border-white/10 shadow-xl whitespace-nowrap opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 z-50">
+            Preferences
           </span>
         </Link>
       </aside>

@@ -594,11 +594,54 @@ export const api = {
     }
   },
 
-  // Search
+  // Search (with franchise collection expansion + chronological ordering)
   search: async (query: string, page = 1): Promise<(Movie | TVShow)[]> => {
     try {
       const res = await tmdbClient.get('/search/multi', { params: { query, page } });
-      return (res.data.results || []).filter((item: any) => item.media_type === 'movie' || item.media_type === 'tv');
+      const rawResults: (Movie | TVShow)[] = (res.data.results || []).filter(
+        (item: any) => item.media_type === 'movie' || item.media_type === 'tv'
+      );
+
+      const getDateKey = (item: Movie | TVShow) =>
+        (item as Movie).release_date || (item as TVShow).first_air_date || '9999-12-31';
+
+      // On page 1, expand the top movie's TMDB collection so every part of the franchise is included
+      if (page === 1) {
+        const topMovie = rawResults.find((item) => item.media_type === 'movie');
+        if (topMovie) {
+          try {
+            const detailsRes = await tmdbClient.get(`/movie/${topMovie.id}`);
+            const collectionId = detailsRes.data?.belongs_to_collection?.id;
+            if (collectionId) {
+              const colRes = await tmdbClient.get(`/collection/${collectionId}`);
+              const parts: Movie[] = (colRes.data?.parts || []).map((p: any) => ({
+                ...p,
+                media_type: 'movie' as const,
+              }));
+
+              const seen = new Set<string>();
+              const sortedParts = [...parts]
+                .sort((a, b) => getDateKey(a).localeCompare(getDateKey(b)))
+                .filter((part) => {
+                  const key = `movie-${part.id}`;
+                  if (seen.has(key)) return false;
+                  seen.add(key);
+                  return true;
+                });
+
+              const remaining = rawResults
+                .filter((item) => !seen.has(`${item.media_type}-${item.id}`))
+                .sort((a, b) => getDateKey(a).localeCompare(getDateKey(b)));
+
+              return [...sortedParts, ...remaining];
+            }
+          } catch {
+            // Fall through to standard chronological sort
+          }
+        }
+      }
+
+      return [...rawResults].sort((a, b) => getDateKey(a).localeCompare(getDateKey(b)));
     } catch {
       return [];
     }
