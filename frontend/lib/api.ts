@@ -158,8 +158,8 @@ export const getEmbedUrl = (
   switch (selectedServer) {
     case 'cinezo':
       return isTV
-        ? `https://cinezo.net/embed/tv/${tmdbId}/${season}/${episode}`
-        : `https://cinezo.net/embed/movie/${tmdbId}`;
+        ? `https://cinezo.st/tv/${tmdbId}/${season}/${episode}`
+        : `https://cinezo.st/movie/${tmdbId}`;
 
     case 'cinesrc':
       return isTV
@@ -218,8 +218,8 @@ export const getEmbedUrl = (
 
     case 'mapple':
       return isTV
-        ? `https://mapple.uk/watch/tv/${tmdbId}-${season}-${episode}`
-        : `https://mapple.uk/watch/movie/${tmdbId}`;
+        ? `https://mapple.fun/watch/tv/${tmdbId}-${season}-${episode}`
+        : `https://mapple.fun/watch/movie/${tmdbId}`;
 
     case 'primesrc':
       return isTV
@@ -233,8 +233,8 @@ export const getEmbedUrl = (
 
     case 'autoembed':
       return isTV
-        ? `https://player.autoembed.cc/embed/tv/${tmdbId}/${season}/${episode}`
-        : `https://player.autoembed.cc/embed/movie/${tmdbId}`;
+        ? `https://autoembed.me/tv/tmdb/${tmdbId}-${season}-${episode}`
+        : `https://autoembed.me/movie/tmdb/${tmdbId}`;
 
     case 'vixsrc':
       return isTV
@@ -248,8 +248,8 @@ export const getEmbedUrl = (
 
     case 'vidfast':
       return isTV
-        ? `https://vidfast.pro/tv/${tmdbId}/${season}/${episode}?autoPlay=true`
-        : `https://vidfast.pro/movie/${tmdbId}?autoPlay=true`;
+        ? `https://vidfast.vc/tv/${tmdbId}/${season}/${episode}?autoPlay=true`
+        : `https://vidfast.vc/movie/${tmdbId}?autoPlay=true`;
 
     case 'filmu':
       return isTV
@@ -298,8 +298,8 @@ export const getEmbedUrl = (
 
     case 'vidsrcme':
       return isTV
-        ? `https://vidsrc.me/embed/tv?tmdb=${tmdbId}&season=${season}&episode=${episode}`
-        : `https://vidsrc.me/embed/movie?tmdb=${tmdbId}`;
+        ? `https://vidsrcme.ru/embed/tv/${tmdbId}/${season}/${episode}`
+        : `https://vidsrcme.ru/embed/movie/${tmdbId}`;
 
     case '1embed':
       return isTV
@@ -308,8 +308,8 @@ export const getEmbedUrl = (
 
     default:
       return isTV
-        ? `https://cinezo.net/embed/tv/${tmdbId}/${season}/${episode}`
-        : `https://cinezo.net/embed/movie/${tmdbId}`;
+        ? `https://cinezo.st/tv/${tmdbId}/${season}/${episode}`
+        : `https://cinezo.st/movie/${tmdbId}`;
   }
 };
 
