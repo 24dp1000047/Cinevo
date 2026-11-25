@@ -30,11 +30,15 @@ export default function DiscoverClient() {
         .map((g) => parseInt(g.trim(), 10))
         .filter((n) => !isNaN(n))
     : [];
+  const initialSort = (searchParams.get('sort') as DiscoverFilters['sortBy']) || 'popularity.desc';
+  const initialMinRating = parseFloat(searchParams.get('minRating') || '0') || 0;
 
   const [filters, setFilters] = useState<DiscoverFilters>({
     ...DEFAULT_FILTERS,
     mediaType: initialMediaType,
     genres: initialGenres,
+    sortBy: initialSort,
+    minRating: initialMinRating,
   });
 
   const [items, setItems] = useState<(Movie | TVShow)[]>([]);

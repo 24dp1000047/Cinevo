@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Play, Flame, Sparkles, ChevronDown, ChevronLeft, ChevronRight, Check } from 'lucide-react';
+import { Play, Flame, Sparkles, ChevronDown, ChevronLeft, ChevronRight, Check, Layers, Rocket, Trophy, Skull } from 'lucide-react';
 import {
   useTrendingMovies,
   usePopularMovies,
@@ -40,6 +40,53 @@ const STREAMING_PROVIDERS = [
   { id: 2552, name: 'Apple TV+', badge: 'tv', badgeBg: 'bg-zinc-900 text-white border border-white/20' },
   { id: 4330, name: 'Paramount+', badge: 'P+', badgeBg: 'bg-blue-600 text-white' },
   { id: 453, name: 'Hulu', badge: 'H', badgeBg: 'bg-emerald-500 text-zinc-950' },
+];
+
+const THEMATIC_COLLECTIONS = [
+  {
+    tag: 'SCI-FI VAULT',
+    title: 'Mind-Bending Sci-Fi',
+    description: 'Space, AI, Time Travel & Parallel...',
+    href: '/discover?type=movie&genre=878&minRating=7',
+    icon: Rocket,
+    gradient: 'from-blue-950/90 via-[#0d1528] to-[#0a0b10]',
+    border: 'border-blue-500/25 hover:border-blue-400/60',
+    iconClass: 'text-sky-400 bg-sky-500/10 border-sky-400/20',
+    tagClass: 'bg-blue-500/15 text-blue-200 border-blue-400/20',
+  },
+  {
+    tag: 'TOP RATED',
+    title: 'Award-Winning Masterpieces',
+    description: 'Oscar Winners & Critically Acclaimed...',
+    href: '/discover?type=movie&sort=vote_average.desc&minRating=8',
+    icon: Trophy,
+    gradient: 'from-amber-950/80 via-[#1f1308] to-[#0a0b10]',
+    border: 'border-amber-500/25 hover:border-amber-400/60',
+    iconClass: 'text-amber-400 bg-amber-500/10 border-amber-400/20',
+    tagClass: 'bg-amber-500/15 text-amber-200 border-amber-400/20',
+  },
+  {
+    tag: 'ACTION RUSH',
+    title: 'High-Octane Adrenaline',
+    description: 'Action, Heists, Martial Arts & Car...',
+    href: '/discover?type=movie&genre=28',
+    icon: Flame,
+    gradient: 'from-red-950/85 via-[#220a0e] to-[#0a0b10]',
+    border: 'border-red-500/25 hover:border-red-400/60',
+    iconClass: 'text-rose-400 bg-rose-500/10 border-rose-400/20',
+    tagClass: 'bg-rose-500/15 text-rose-200 border-rose-400/20',
+  },
+  {
+    tag: 'SPOOKY NIGHTS',
+    title: 'Midnight Horror & Spine-Chills',
+    description: 'Supernatural, Psychological & Monsters',
+    href: '/discover?type=movie&genre=27',
+    icon: Skull,
+    gradient: 'from-purple-950/85 via-[#180c24] to-[#0a0b10]',
+    border: 'border-purple-500/25 hover:border-purple-400/60',
+    iconClass: 'text-purple-400 bg-purple-500/10 border-purple-400/20',
+    tagClass: 'bg-purple-500/15 text-purple-200 border-purple-400/20',
+  },
 ];
 
 export default function HomePage() {
@@ -317,6 +364,51 @@ export default function HomePage() {
               </button>
             </div>
           )}
+        </section>
+
+        {/* 4. Curated Thematic Collections */}
+        <section className="my-8 px-4 md:px-12">
+          <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white flex items-center gap-2.5 mb-5">
+            <Layers className="w-5 h-5 text-brand-red" />
+            <span>Curated Thematic Collections</span>
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {THEMATIC_COLLECTIONS.map((col) => {
+              const Icon = col.icon;
+              return (
+                <Link
+                  key={col.tag}
+                  href={col.href}
+                  className={`group relative rounded-2xl bg-gradient-to-br ${col.gradient} border ${col.border} p-5 flex flex-col justify-between min-h-[190px] transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl`}
+                >
+                  <div className="flex items-center justify-between gap-2 mb-6">
+                    <span
+                      className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${col.tagClass}`}
+                    >
+                      {col.tag}
+                    </span>
+                    <span
+                      className={`w-9 h-9 rounded-xl border flex items-center justify-center ${col.iconClass}`}
+                    >
+                      <Icon className="w-4 h-4" />
+                    </span>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-extrabold text-white leading-snug mb-1.5 group-hover:text-white">
+                      {col.title}
+                    </h3>
+                    <p className="text-xs text-zinc-400 line-clamp-1 mb-4">{col.description}</p>
+                    <div className="flex items-center gap-1 text-xs font-bold text-zinc-200 group-hover:text-white group-hover:gap-2 transition-all">
+                      <span>Explore Collection</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
         </section>
 
         <MovieRow
